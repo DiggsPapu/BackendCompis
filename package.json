@@ -3,5 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "DiggsPapu",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "graphviz": "^0.0.9",
+    "node-graphviz": "^0.1.1",
+    "nodemon": "^3.1.0",
+    "util": "^0.12.5"
+  },
+  "scripts": {
+    "client": " yarn --cwd client run start",
+    "server": "nodemon index",
+    "start": "concurrently \"yarn run server\" \"yarn run client\""
+  }
 }
