@@ -1,4 +1,4 @@
-export class TreeNode {
+class TreeNode {
   constructor(value, left, right, position) {
     this.value = value;
     this.left = left;
@@ -16,4 +16,5 @@ export class TreeNode {
   remove_right() {
     this.right = null;
   }
-}
+};
+module.exports = TreeNode

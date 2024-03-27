@@ -8,9 +8,10 @@
  *
  */
 
-export class State {
+class State {
   constructor(label, transitions) {
     this.label = label;
     this.transitions = transitions;
   }
 }
+module.exports = State

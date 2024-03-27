@@ -1,7 +1,7 @@
-import { NFA } from "./NFA.js";
-import { State } from "./State.js";
+var NFA = require("./NFA.js");
+var State = require("./State.js");
 
-export const checkState = (newState, stack) => {
+const checkState = (newState, stack) => {
   for (let stackIndex = 0; stackIndex < stack.length; stackIndex++){
     if (stack[stackIndex].label===newState){
       return true;
@@ -10,7 +10,7 @@ export const checkState = (newState, stack) => {
   return false;
 };
 // E closure para un conjunto de estados T
-export const eClosureT = (T, nfa) => {
+const eClosureT = (T, nfa) => {
   // Creamos un stack
   let stack = [...T];
   // Hacemos el conjunto de closure
@@ -54,7 +54,7 @@ export const eClosureT = (T, nfa) => {
   return E_closure;
 };
 
-export const move = (T, symbol, nfa) => {
+const move = (T, symbol, nfa) => {
   // crear nuevo set de estados que retornara con un symbolo
   let U = [];
   for (let i=0; i < T.length; i++) {
@@ -114,7 +114,7 @@ function isFinalState(state, nfa){
   return false;
 };
 // Conversion from NFA to DFA
-export const NFAToDFA = (nfa) => {
+const NFAToDFA = (nfa) => {
   // El primer dstate es el eclosure del estado inicial
   let initialClosure = eClosureT([nfa.initialState],nfa)
   // Estados del dfa
@@ -171,13 +171,8 @@ export const NFAToDFA = (nfa) => {
   };
   return new NFA(dfaArray[0],finalStates,dfaArray,nfa.alphabet,transitions);
 };
-// ye
-export const generateDirectDFA = (regex) => {
-  console.log("ye");
-};
 function inWhichGroup(label, piGroups){  
   if (label!==undefined){
-    let string = ""
     for (var groupIndex = 0; groupIndex < piGroups.length; groupIndex++){
       if (checkState(label,  piGroups[groupIndex])){
         return groupIndex;
@@ -186,52 +181,7 @@ function inWhichGroup(label, piGroups){
   }
   return undefined;
 };
-function sameGroup(state1, state2, alphabet, piGroups){
-  let state1Transitions = state1.transitions;
-  let state2Transitions = state2.transitions;
-  // Ir comparando transicion por transicion
-  for (let i = 0; i<alphabet.length; i++) {
-    // Retornar falso en caso de que una de las transiciones no sea igual
-    if (inWhichGroup(state1Transitions.get(alphabet[i]),piGroups)!==inWhichGroup(state2Transitions.get(alphabet[i]),piGroups)){
-      return false;
-    }
-  };
-  // Si no salio antes es que no dio error
-  return true;
-};
-function getNewTransitions(state, nfa){
-  let transitionsMap = new Map();
-  for (let alphabetIndex = 0; alphabetIndex < nfa.alphabet.length; alphabetIndex++){
-    let symbol = nfa.alphabet[alphabetIndex]
-    transitionsMap.set(symbol,move(nfa.states.filter((state1)=>state1.label===state.transitions.get(symbol)),symbol,nfa)[0].label);    
-  };
-  return transitionsMap;
-};
-function printGroups(groups, alphabet){
-  let groupS = ""
-  for (let i = 0; i<groups.length; i++) {
-    groupS+="group"+i+":\n";
-    for (let k =0; k<groups[i].length; k++){
-      groupS+=" "+groups[i][k].label+":\n";
-      for (let j = 0; j<alphabet.length; j++){
-        groupS +="  "+alphabet[j]+"->"+groups[i][k].transitions.get(alphabet[j])+"\n";
-      };
-    };
-    groupS+="\n"
-  };
-  return groupS;
-};
-function printGroup(group, alphabet) {
-  let groupS = "groupN:\n";
-  for (let k =0; k<group.length; k++){
-    groupS+=" "+group[k].label+":\n";
-    for (let j = 0; j<alphabet.length; j++){
-      groupS +="  "+alphabet[j]+"->"+group[k].transitions.get(alphabet[j])+"\n";
-    };
-  };
-  return groupS;
-};
-export const minimizeDFA = (dfa) => {
+const minimizeDFA = (dfa) => {
   const nonFinalStates = [...dfa.states.filter((state) => dfa.finalState.find((state1)=>state1.label===state.label)===undefined)];
   const finalStates = [...dfa.finalState];
   let piGroups = [nonFinalStates, finalStates];
@@ -339,4 +289,11 @@ export const minimizeDFA = (dfa) => {
   };
   let dfaMinimized = new NFA(initialState, finalState, arrayOfStates, alphabet, transitions1);
   return dfaMinimized;
+};
+module.exports = {
+  eClosureT,
+  move,
+  checkState,
+  minimizeDFA,
+  NFAToDFA
 };

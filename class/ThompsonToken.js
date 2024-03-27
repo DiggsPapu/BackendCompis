@@ -1,7 +1,6 @@
-import { NFA } from "./NFA.js";
-import { State } from "./State.js";
-
-export class ThompsonToken {
+var NFA = require("./NFA.js");
+var State = require("./State.js");
+class ThompsonToken {
   constructor(postfix) {
     // cosas para el algoritmo
     this.postfix = postfix;
@@ -451,3 +450,4 @@ export class ThompsonToken {
     return NFA;
   }
 }
+module.exports = ThompsonToken

@@ -1,4 +1,4 @@
-export const drawGraphDFA = (nfa) => {
+const drawGraphDFA = (nfa) => {
     let dotStr = "digraph fsm {\n";
     dotStr += "rankdir=LR;\n";
     dotStr += 'size="8,5";\n';
@@ -113,7 +113,7 @@ export const drawGraphDFA = (nfa) => {
     return dotStr;
   };
   
-  export const drawGraph = (nfa) => {
+const drawGraph = (nfa) => {
     let dotStr = "digraph fsm {\n";
     dotStr += "rankdir=LR;\n";
     dotStr += 'size="8,5";\n';
@@ -254,7 +254,7 @@ export const drawGraphDFA = (nfa) => {
     return dotStr;
   };
   
-  export const drawGraphTokens = (nfa) => {
+const drawGraphTokens = (nfa) => {
     let dotStr = "digraph fsm {\n";
     dotStr += "rankdir=LR;\n";
     dotStr += 'size="8,5";\n';
@@ -281,7 +281,7 @@ export const drawGraphDFA = (nfa) => {
     return dotStr;
   };
   
-  export const drawTreeTokens = (tree) =>{
+  const drawTreeTokens = (tree) =>{
     let counter = 0;
     let dotStr = "digraph tree {\n";
     dotStr += "rankdir=TB;\n";
@@ -308,7 +308,7 @@ export const drawGraphDFA = (nfa) => {
     };
     return [string_graph, counter];
   };
-  export const drawTreeTokensAscii = (tree) =>{
+const drawTreeTokensAscii = (tree) =>{
     let counter = 0;
     let dotStr = "digraph tree {\n";
     dotStr += "rankdir=TB;\n";
@@ -339,4 +339,12 @@ export const drawGraphDFA = (nfa) => {
     };
     return [string_graph, counter];
   };
-  
+
+  module.exports = {
+    drawGraph,
+    drawGraphDFA,
+    drawGraphTokens,
+    drawTreeNodeTokens,
+    drawTreeNodeTokensAscii,
+    drawTreeTokens
+  }

@@ -1,6 +1,6 @@
-import { Token } from "./Token";
-import { TreeNode } from "./TreeNode";
-export class Regex {
+var Token = require("./Token");
+var TreeNode = require("./TreeNode");
+class Regex {
   constructor(regex) {
     this.regex = regex;
     this.valid = this.isValid(regex);
@@ -335,3 +335,4 @@ export class Regex {
     return [nodeStack.pop(), nodeArray, pos];
   }
 }
+module.exports = Regex

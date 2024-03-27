@@ -25,7 +25,7 @@ const TokenSpec = [
   [/^[a-zA-Z]+[0-9]*[a-zA-Z]/, Token.DEFINITION]
 ];
 
-export class Tokenizer {
+class Tokenizer {
   constructor(input) {
     this.input = input;
     this.cursor = 0;
@@ -71,4 +71,9 @@ export class Tokenizer {
 
     throw new SyntaxError(`Unexpected token: "${inputSlice[0]}"`);
   }
-}
+};
+module.exports = {
+  TokenTypes,
+  TokenSpec,
+  Tokenizer
+};

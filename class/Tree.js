@@ -1,6 +1,6 @@
-import { TreeNode } from "./TreeNode";
+var TreeNode = require("./TreeNode");
 
-export class Tree {
+class Tree {
   constructor() {
     this.root = new TreeNode(null, null, null);
   }
@@ -25,3 +25,4 @@ export class Tree {
     }
   }
 }
+module.exports = Tree;

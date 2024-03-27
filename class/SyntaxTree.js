@@ -1,9 +1,9 @@
-import { NFA } from "./NFA";
-import { State } from "./State";
-import { Token } from "./Token";
-import { TreeNode } from "./TreeNode";
+var NFA = require("./NFA");
+var State = require("./State");
+var Token = require("./Token");
+var TreeNode = ("./TreeNode");
 
-export class SyntaxTree {
+class SyntaxTree {
   constructor(treeRoot, nodes, regex, maxpos) {
     this.treeRoot = treeRoot;
     this.nodes = nodes;
@@ -337,3 +337,4 @@ export class SyntaxTree {
     return new NFA(q0,finalStates,dfaArray,this.alphabet,transitions);
   }
 }
+module.exports = SyntaxTree

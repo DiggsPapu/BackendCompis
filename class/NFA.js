@@ -1,5 +1,7 @@
-import { eClosureT, move, checkState } from "./DFA";
-import { State } from "./State";
+var eClosureT = require("./DFA") 
+var move = require("./DFA"); 
+var checkState = require("./DFA");
+var State = require("./State");
 
 /**
  * Clase con el NFA a construir, incluye:
@@ -13,7 +15,7 @@ import { State } from "./State";
  */
 
 // esta es la clase del afn
-export class NFA {
+class NFA {
   constructor(initialState, finalState, states, alphabet, transitions) {
     // estos solo son revisiones para ver si los parametros ingresados con correctos, luego construye el objeto
 
@@ -177,3 +179,5 @@ export class NFA {
     return new NFA(q0,qf,states,[...this.alphabet, ...star.alphabet],transitions);
   }  
 };
+
+module.exports = NFA

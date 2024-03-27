@@ -3,12 +3,12 @@ const fs = require('fs');
 const regex = require('../class/Regex');
 const thompson = require('../class/ThompsonToken');
 const syntaxTree = require('../class/SyntaxTree');
-const { NFAToDFA, minimizeDFA } = require("./DFA");
+const { NFAToDFA, minimizeDFA } = require("../class/DFA");
 const {
     drawGraphDFA,
     drawGraph,
     drawTreeTokens,
-  } = require("./drawFunctions");
+  } = require("./draw.functions.js");
 
 function operateRegex(input, res){
     try {
@@ -20,12 +20,6 @@ function operateRegex(input, res){
         const dfaMinimized_ = minimizeDFA(nfaToDfa_);
         const directDfa_ = ast_.generateDirectDFATokens()
         const directDFAMin_ = minimizeDFA(directDfa_);
-        const graphDots = [
-            drawGraph(thompson_.nfa), drawGraphDFA(nfaToDfa_), 
-            drawGraphDFA(directDFAMin_), drawGraphDFA(dfaMinimized_),
-            drawGraphDFA(dfaMinimized_), drawTreeTokens(ast_),
-            drawGraphDFA(directDfa_), drawGraphDFA(directDFAMin_)
-        ]
         res.status(200).send({
             'NFA':drawGraph(thompson_.nfa), 'NFA_DFA':drawGraphDFA(nfaToDfa_), 
             'NFA_DFA_Min':drawGraphDFA(dfaMinimized_), 'AST':drawTreeTokens(ast_), 

@@ -1,7 +1,7 @@
-import { NFA } from "./NFA.js";
-import { State } from "./State.js";
+var NFA = require("./NFA.js");
+var State = require("./State.js");
 
-export class Thompson {
+class Thompson {
   constructor(postfix) {
     // cosas para el algoritmo
     this.postfix = postfix;
@@ -453,3 +453,4 @@ export class Thompson {
     return NFA;
   }
 }
+module.exports = Thompson
