@@ -1,30 +1,3 @@
-const TokenTypes = {
-  NUMBER: "NUMBER",
-  IDENTIFIER: "IDENTIFIER",
-  ADDITION: "+",
-  SUBTRACTION: "-",
-  MULTIPLICATION: "*",
-  DIVISION: "/",
-  EXPONENTIATION: "^",
-  PARENTHESIS_LEFT: "(",
-  PARENTHESIS_RIGHT: ")",
-  DEFINITION: "DEFINITION",
-};
-
-const TokenSpec = [
-  [/^\s+/, null],
-  [/^(?:\d+(?:\.\d*)?|\.\d+)/, TokenTypes.NUMBER],
-  [/^[a-z]+/, TokenTypes.IDENTIFIER],
-  [/^\+/, TokenTypes.ADDITION],
-  [/^\-/, TokenTypes.SUBTRACTION],
-  [/^\*/, TokenTypes.MULTIPLICATION],
-  [/^\//, TokenTypes.DIVISION],
-  [/^\^/, TokenTypes.EXPONENTIATION],
-  [/^\(/, TokenTypes.PARENTHESIS_LEFT],
-  [/^\)/, TokenTypes.PARENTHESIS_RIGHT],
-  [/^[a-zA-Z]+[0-9]*[a-zA-Z]/, Token.DEFINITION]
-];
-
 class Tokenizer {
   constructor(input) {
     this.input = input;
@@ -72,8 +45,4 @@ class Tokenizer {
     throw new SyntaxError(`Unexpected token: "${inputSlice[0]}"`);
   }
 };
-module.exports = {
-  TokenTypes,
-  TokenSpec,
-  Tokenizer
-};
+module.exports = Tokenizer

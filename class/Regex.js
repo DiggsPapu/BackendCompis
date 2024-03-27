@@ -1,5 +1,5 @@
-var Token = require("./Token");
 var TreeNode = require("./TreeNode");
+var Token = require("./Token");
 class Regex {
   constructor(regex) {
     this.regex = regex;

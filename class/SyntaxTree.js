@@ -1,7 +1,7 @@
 var NFA = require("./NFA");
 var State = require("./State");
 var Token = require("./Token");
-var TreeNode = ("./TreeNode");
+var TreeNode = require("./TreeNode");
 
 class SyntaxTree {
   constructor(treeRoot, nodes, regex, maxpos) {

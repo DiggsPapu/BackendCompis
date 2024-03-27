@@ -101,7 +101,6 @@ class NFA {
       let node_toChange = star.states[k];
       let new_label = "q"+(parseInt(star.states[k].label.substring(1))+steps_moved).toString();
       let node_toChangeTransitions = Array.from(node_toChange.transitions);
-      console.log(node_toChangeTransitions);
       let new_transitions = new Map();
       let new_state = null;
       if (node_toChangeTransitions[0] !== undefined && node_toChangeTransitions.length<3){
