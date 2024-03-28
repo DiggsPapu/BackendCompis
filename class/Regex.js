@@ -12,6 +12,12 @@ class Regex {
       console.error("input incorrecto");
     }
   }
+  postfixTokenizedToPostfix(){
+    this.postfix = ""
+    for (let k = 0; k < this.postfixTokenized.length; k++){
+      this.postfix+=this.postfixTokenized[k].value
+    }
+  }
   // sirve para ver si un elemento es operador
   isOperator(element) {
     return ["|", ".", "?", "*", "+", "(", ")"].includes(element);
