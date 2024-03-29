@@ -5,6 +5,8 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 
 var automatonRoutes = require('./routes/automaton.route');
+var yalexRoutes = require('./routes/yalex.route');
+
 const port = process.env.PORT || 4000;
 var app = express();
 app.use(cors());
@@ -28,4 +30,5 @@ app.listen(port, ()=>
     );
 
 app.use(automatonRoutes);
+app.use(yalexRoutes);
 module.exports = app;
