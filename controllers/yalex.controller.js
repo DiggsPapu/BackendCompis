@@ -14,10 +14,8 @@ function analyzeYalex(req, res){
             res.status(500).send('Internal Server Error');
             return;
         }
-        
         // Set the content type to SVG
         res.set('Content-Type', 'image/svg+xml');
-        
         // Send the SVG file in the response
         res.send(data);
     });
@@ -31,11 +29,9 @@ function getDFA(req, res){
                 console.error(err);
                 res.status(500).send('Internal Server Error');
                 return;
-            }
-            
+            };
             // Set the content type to SVG
             res.set('Content-Type', 'image/svg+xml');
-            
             // Send the SVG file in the response
             res.send(data);
         });

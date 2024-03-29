@@ -10,8 +10,8 @@ class YalexAnalyzer{
         this.ast = null;
         this.loadAfdCheckers();
         this.readFile(data);
-        console.log(this.tokensSet);
-        console.log(this.rulesSet);
+        // console.log(this.tokensSet);
+        // console.log(this.rulesSet);
         this.createBigTree();
     };
     loadAfdCheckers(){
@@ -30,7 +30,7 @@ class YalexAnalyzer{
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.headerDFA = ast.generateDirectDFATokens();
-      console.log(this.headerDFA)
+      // console.log(this.headerDFA)
       // AFD'S FOR THE DEFINITION
       // Let +
       regex = new Regex("let +");
@@ -49,7 +49,7 @@ class YalexAnalyzer{
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.definitionDefinitionDFA = ast.generateDirectDFATokens();
       
-      console.log(this.definitionDefinitionDFA)
+      // console.log(this.definitionDefinitionDFA)
       // AFD FOR THE RULES
       regex = new Regex("( )*rule tokens( )*=")
       tokenTree = regex.constructTokenTree();
@@ -311,21 +311,21 @@ class YalexAnalyzer{
           };
         };
       };
-      console.log(this.tokensSet);
+      // console.log(this.tokensSet);
   };
   createBigTree(){
     this.eliminateRecursion();
     this.tokenize();
     this.generalRegexTokenized = this.regex.insertDotsInRegexTokenizedWithWords(this.generalRegexTokenized);
     this.generalRegexPostfix = this.regex.infixToPostfixTokenized(this.generalRegexTokenized);
-    console.log(this.generalRegexPostfix)
+    // console.log(this.generalRegexPostfix)
     this.regex.postfixTokenized = this.generalRegexPostfix;
     this.tokenTree = this.regex.constructTokenTree();
     this.regex.regexWithDots = this.generalRegexTokenized;
     this.ast = new SyntaxTree(this.tokenTree[0], this.tokenTree[1], this.regex, this.tokenTree[2]);
-    console.log(this.ast)
+    // console.log(this.ast)
     this.directDFA = this.ast.generateDirectDFATokens();
-    console.log(this.directDFA);
+    // console.log(this.directDFA);
 
   };
   // This will only tokenize and convert based on what pattern it is for example [0-4] to (0|1|2|3|4) but it will always be in ascii code to avoid conflicts
@@ -342,7 +342,7 @@ class YalexAnalyzer{
     this.tokenTree = this.regex.constructTokenTree();
     this.ast = new SyntaxTree(this.tokenTree[0], this.tokenTree[1], this.regex, this.tokenTree[2]);
     afds.push(this.ast.generateDirectDFATokens());
-    console.log(this.generalRegex);
+    // console.log(this.generalRegex);
     this.generalRegexTokenized = [];
     let complementIndex = 0;
     this.complementSet = [];
@@ -357,7 +357,7 @@ class YalexAnalyzer{
       let afdIndex = 0;
       let c = this.generalRegex[i];
       for (let n = 0; n<afds.length; n++){
-        console.log(`Token to be analyzed: ${c}`)
+        // console.log(`Token to be analyzed: ${c}`)
         let currentDfa = afds[n];
         [isWord, indexTemp, S] = currentDfa.yalexSimulate(this.generalRegex, i);
         if (isWord && indexTemp>index){
@@ -384,7 +384,7 @@ class YalexAnalyzer{
           this.generalRegexTokenized.splice(complementIndex, this.generalRegexTokenized.length - complementIndex);
           // get the complement
           let newComplement = []
-          console.log(this.complementSet);
+          // console.log(this.complementSet);
           for (let k = 0; k < 255; k++){
             if (!this.complementSet.includes(k)) {
               newComplement.push(new Token(k, -2));
@@ -422,8 +422,8 @@ class YalexAnalyzer{
         // this.generalRegexTokenized.push(new Token("(", this.getPrecedence("(")));
         let nextIndex = this.generalRegex[i+2].charCodeAt(0);
         let previousIndex = this.generalRegexTokenized[this.generalRegexTokenized.length-2].value;
-        console.log(nextIndex)
-        console.log(previousIndex)
+        // console.log(nextIndex)
+        // console.log(previousIndex)
         if (previousIndex<nextIndex){
           for (let j = previousIndex+1; j < nextIndex; j++) {
             this.generalRegexTokenized.push(new Token(j, -2));
@@ -441,7 +441,7 @@ class YalexAnalyzer{
     if (!this.regex.isValidTokens(this.generalRegexTokenized)){
       throw new Error(`Parsing error, something was not right in the regex`);
     }
-    console.log(this.generalRegexTokenized);  
+    // console.log(this.generalRegexTokenized);  
   };
   getPrecedence(c){
     switch(c){
@@ -510,7 +510,7 @@ class YalexAnalyzer{
     };
     this.generalRegex.slice(0, this.generalRegex.length-2);
     this.generalRegex += ")";
-    console.log(this.generalRegex)
+    // console.log(this.generalRegex)
     // Get the afds of the symbols that cause recursion
     keys = Array.from(this.tokensSet.keys());
     let afds = []
@@ -572,7 +572,7 @@ class YalexAnalyzer{
         array[i] = "("+this.tokensSet.get(keys[afdIndex+4])+")";
         array.splice(i+1, index-i);
         this.generalRegex = array.join('');
-        console.log(`recursive detected ${this.generalRegex}`)
+        // console.log(`recursive detected ${this.generalRegex}`)
         // Esto sirve para analizar el nuevo string para detectar si hay otra recursion a solucionar
         i--;
         isWordChar = false;
@@ -601,11 +601,11 @@ class YalexAnalyzer{
         throw  new Error ("Logic error, unbalanced brackets or brackets anidados");
       }
     };
-    console.log(this.generalRegex);
+    // console.log(this.generalRegex);
     
   }
   handlingSimpleQuotes(regex, i){
-    console.log(i)
+    // console.log(i)
     if ( regex[i+1]==="+" || regex[i+1] === "*" || regex[i+1] === "." || regex[i+1] === "(" || regex[i+1] === ")"){
       regex = regex.replace(this.generalRegex.slice(i, i+3), "(\\"+regex[i+1]+")");
     }
