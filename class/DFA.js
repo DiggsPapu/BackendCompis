@@ -10,7 +10,7 @@ const checkState = (newState, stack) => {
   return false;
 };
 // E closure para un conjunto de estados T
-const eClosureT = (T, nfa) => {
+function eClosureT(T, nfa){
   // Creamos un stack
   let stack = [...T];
   // Hacemos el conjunto de closure
@@ -54,7 +54,7 @@ const eClosureT = (T, nfa) => {
   return E_closure;
 };
 
-const move = (T, symbol, nfa) => {
+function move(T, symbol, nfa){
   // crear nuevo set de estados que retornara con un symbolo
   let U = [];
   for (let i=0; i < T.length; i++) {

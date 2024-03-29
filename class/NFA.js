@@ -1,6 +1,5 @@
-var eClosureT = require("./DFA") 
-var move = require("./DFA"); 
-var checkState = require("./DFA");
+
+const { move, checkState, eClosureT } = require("./DFA");
 var State = require("./State");
 
 /**
@@ -34,14 +33,84 @@ class NFA {
     this.alphabet = alphabet;
     this.transitions = transitions;
   }
+  // E closure para un conjunto de estados T
+  eClosureT(T, nfa){
+    // Creamos un stack
+    let stack = [...T];
+    // Hacemos el conjunto de closure
+    let E_closure = [...T];
+    // Siempre y cuando el stack no este vacio estaremos en el while
+    while (stack.length > 0) {
+      //  sacamos un elemento del stack
+      let t = stack.pop();
+      // Si la transicion tiene epsilon elementos
+      if (t.transitions.has("ε")) {
+        // En caso de que sea una transicion a un solo elemento
+        if (typeof(t.transitions.get("ε"))==="string"){
+          // Se asigna el unico elemento
+          let u = t.transitions.get("ε");
+          // Se asegura que el eclosure no incluya el elemento y que si exista el estado
+          if (!(E_closure.includes(u)) && nfa.states.find((s) => s.label === u) !== undefined && E_closure.filter((s) => s.label === u).length===0) {
+            // Asignamos un valor del estado
+            let value = nfa.states.find((s) => s.label === u);
+            // Creamos un nuevo estado en memoria para no usar apuntadores
+            let newState = new State(value.label, value.transitions);
+            // Pusheamos en stack
+            stack.push(newState);
+            // Pusheamos en eclosure
+            E_closure.push(newState);
+          };
+        }
+        // Lo mismo pero se hace un for para recorrer una lista con multiples estados a epsilon
+        else{
+          for (let i = 0; i < t.transitions.get("ε").length; i++) {
+            let u = t.transitions.get("ε")[i];
+            if (!(this.checkState(u,E_closure)) && nfa.states.find((s) => s.label === u) !== undefined) {
+              let value = nfa.states.find((s) => s.label === u);
+              let newState = new State(value.label, value.transitions);
+              stack.push(newState);
+              E_closure.push(new State(value.label, value.transitions));
+            };
+          };
+        };
+      };
+    };
+    return E_closure;
+  };
+  checkState = (newState, stack) => {
+    for (let stackIndex = 0; stackIndex < stack.length; stackIndex++){
+      if (stack[stackIndex].label===newState){
+        return true;
+      };
+    };
+    return false;
+  };
+  move(T, symbol, nfa){
+    // crear nuevo set de estados que retornara con un symbolo
+    let U = [];
+    for (let i=0; i < T.length; i++) {
+      let transitions = T[i].transitions.get(symbol);
+      if (transitions!==undefined && typeof(transitions)==="string"){
+        U.push(nfa.states.find((s) => s.label === transitions));
+      }
+      else if (transitions!==undefined){
+        for (let label in transitions) {
+          // console.log(label)
+          U.push(nfa.states.find((s) => s.label === label));
+        };
+      }
+    };
+    return U;
+  };
+
   // Inicializar la simulacion
   simulate = (input) => {
     // Inicializar el estado 0
-    let S = eClosureT([this.initialState], this);
+    let S = this.eClosureT([this.initialState], this);
     let indexInput = 0;
     let c = input[indexInput];
     while (indexInput<input.length) {
-      S = eClosureT(move(S, c, this),this);
+      S = this.eClosureT(this.move(S, c, this),this);
       indexInput++;
       c = input[indexInput];
     };
@@ -49,7 +118,7 @@ class NFA {
       if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
         return true;
       } 
-      else if (checkState(S[indexState].label, this.finalState)){
+      else if (this.checkState(S[indexState].label, this.finalState)){
         return true;
       };
     };
@@ -59,19 +128,19 @@ class NFA {
   yalexSimulate = (input, indexInput) => {
     // console.log(input);
     // Inicializar el estado 0
-    let S = eClosureT([this.initialState], this);
+    let S = this.eClosureT([this.initialState], this);
     // console.log(S)
     let c = input[indexInput];
     // console.log(c);
     while (indexInput<input.length) {
-      S = eClosureT(move(S, c, this),this);
+      S = this.eClosureT(this.move(S, c, this),this);
       // console.log(S)
       for (let indexState = 0; indexState < S.length; indexState++) {
         if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
           // console.log("1salgo")
           return [true, indexInput, S];
         } 
-        else if (checkState(S[indexState].label, this.finalState)){
+        else if (this.checkState(S[indexState].label, this.finalState)){
           // console.log("2salgo")
           return [true, indexInput, S];
         };
