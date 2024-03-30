@@ -1,4 +1,3 @@
-const NFA = require("./NFA");
 var Regex = require("./Regex");
 var SyntaxTree = require("./SyntaxTree");
 var Token = require("./Token");
@@ -303,8 +302,10 @@ class YalexAnalyzer{
   createBigTree(){
     this.rulesVal = new Map();
     for (let k = 0; k < Array.from(this.rulesSet.keys()).length; k++ ){
-      let newRegex = this.eliminateRecursion2(Array.from(this.rulesSet.keys())[k]);
-      let regexTokenized = this.tokenize2(newRegex);
+      let newRegex = this.eliminateRecursion(Array.from(this.rulesSet.keys())[k]);
+      let regexTokenized = this.tokenize(newRegex);
+      console.log(newRegex)
+      console.log(regexTokenized);
       let regexWithDots = this.regex.insertDotsInRegexTokenizedWithWords(regexTokenized);
       let postfixRegex = this.regex.infixToPostfixTokenized(regexWithDots);
       this.regex.postfixTokenized = postfixRegex;
@@ -345,7 +346,7 @@ class YalexAnalyzer{
     }
     this.generalRegex = this.generalRegex.slice(0, this.generalRegex.length-1);
     this.generalRegex += ")";
-    this.generalRegexTokenized = this.tokenize2(this.generalRegex);
+    this.generalRegexTokenized = this.tokenize(this.generalRegex);
     this.generalRegexTokenized = this.regex.insertDotsInRegexTokenizedWithWords(this.generalRegexTokenized);
     this.generalRegexPostfix = this.regex.infixToPostfixTokenized(this.generalRegexTokenized);
     this.regex.postfixTokenized = this.generalRegexPostfix;
@@ -354,7 +355,7 @@ class YalexAnalyzer{
     this.ast = new SyntaxTree(this.tokenTree[0], this.tokenTree[1], this.regex, this.tokenTree[2]);
     this.directDFA = this.ast.generateDirectDFATokens();
   };
-  tokenize2(regex){
+  tokenize(regex){
     let afds = [];
     // AFD FOR THE LEXER
     // " AFD for strings or inside brackets
@@ -406,7 +407,7 @@ class YalexAnalyzer{
         // Complement operation ends
         if (this.isComplement){
           // Array that will be eliminated
-          regex.splice(complementIndex, regexTokenized.length - complementIndex);
+          regexTokenized.splice(complementIndex, regexTokenized.length - complementIndex);
           // get the complement
           let newComplement = []
           // console.log(this.complementSet);
@@ -439,6 +440,7 @@ class YalexAnalyzer{
           }
         }
         // Delete the "|"
+        regexTokenized.pop();
         regexTokenized.push(new Token (")", this.getPrecedence(")")));
       }
       // Is a range
@@ -516,7 +518,7 @@ class YalexAnalyzer{
       }
     }
   };
-  eliminateRecursion2(regex){
+  eliminateRecursion(regex){
     // console.log(regex)
     // Get the afds of the symbols that cause recursion
     let keys = Array.from(this.tokensSet.keys());

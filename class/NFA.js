@@ -1,5 +1,4 @@
 
-const { move, checkState, eClosureT } = require("./DFA");
 var State = require("./State");
 
 /**
@@ -153,7 +152,7 @@ class NFA {
       if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
         return [true, indexInput, S];
       } 
-      else if (checkState(S[indexState].label, this.finalState)){
+      else if (this.checkState(S[indexState].label, this.finalState)){
         return [true, indexInput, S];
       };
     };
