@@ -1,5 +1,5 @@
 const drawGraphDFA = (nfa) => {
-  console.log(nfa)
+  // console.log(nfa)
     let dotStr = "digraph fsm {\n";
     dotStr += "rankdir=LR;\n";
     dotStr += 'size="8,5";\n';

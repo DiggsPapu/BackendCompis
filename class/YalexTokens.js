@@ -32,10 +32,11 @@ class asciiUniverses {
     this.UNIVERSE = []
     this.TERMINAL = "((\n)|(\t)|(\r)|( ))"
     this.TILDES = ["á","é","í","ó","ú","Á","É","Í","Ó","Ú"]
-    this.MATH = ["\\+", "-", "\\*", "/", "^", "\\(", "\\)", "\\.", "=", ">", "<"]
+    this.MATH = ["\\+", "-", "\\*", "/", "^", "\\(", "\\)", "\\.", "=", ">", "<", "%"]
     this.BRACKETS = ["[","]"]
     this.PARENTHESIS = ["\\(","\\)"]
     this.OPERATORS = ["\\+", "\\*", "\\(","\\)", "\\.", "\\|", "\\?"]
+    this.OPERATORS2 = ["\\+", "\\*", "\\(","\\)", "\\.", "\\?"]
     this.CLEAN_OPERATORS = ["+", "*", "(",")", ".", "|", "?"]
     this.ESCAPE_CHARACTERS = ["\\n", "\\t", "\\r", "\\b", "\\f", "\\s"]
     this.PUNCTUATION = [";","\\.",":", ",", "!", "\\?" ]
@@ -47,7 +48,7 @@ class asciiUniverses {
         this.UNIVERSE.push("\\"+String.fromCharCode(i));  
       }
       else if (String.fromCharCode(i) === "_"||String.fromCharCode(i)==="\\"){
-        console.log(String.fromCharCode(i));
+        // console.log(String.fromCharCode(i));
         continue;
       }
       else{
@@ -59,7 +60,7 @@ class asciiUniverses {
     }
     this.UNIVERSE.push("\\\\");
     this.UNIVERSE.push("\\_")
-    console.log(this.UNIVERSE);
+    // console.log(this.UNIVERSE);
     this.RANGES = [...this.MAYUS, ...this.MINUS, ...this.NUMBER];
     this.DOUBLE_QUOTES = ["\"(", this.RANGES.join("|"),"|", this.MATH.join("|"), "|",this.PUNCTUATION.join("|"), "|", this.ESCAPE_CHARACTERS.join("|"), "|", ["\n", "\t", "\r", "\b"].join("|"),"| )+\""].join("");
     // console.log(this.DOUBLE_QUOTES);
