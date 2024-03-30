@@ -104,7 +104,7 @@ class Regex {
     let last = "";
     for (let i = 0; i < regex.length; i++) {
       const c = regex[i];
-      console.log(i)
+      // console.log(i)
       if (c.precedence === -1 ) {
         lefts++;
       }

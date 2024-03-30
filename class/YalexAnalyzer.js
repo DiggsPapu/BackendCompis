@@ -62,7 +62,8 @@ class YalexAnalyzer{
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.ruleNameDFA = ast.generateDirectDFATokens();
       // rule body
-      regex = new Regex("{( )*return( )+(_|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)+( )*}")
+      console.log(`{(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS2.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|(\n)|(\t)|(\r)|( ))+}`)
+      regex = new Regex(`{(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|(\n)|(\t)|(\r)|( ))+}`)
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.ruleBodyDFA = ast.generateDirectDFATokens();
@@ -222,10 +223,6 @@ class YalexAnalyzer{
               definition=data[indexComentary]+definition;
               this.tokensSet.get("COMMENTARY").push(definition);
             }
-            else if (isHeader && canStartNewRuleSection){
-              this.tokensSet.get("TRAILER").push(data.slice(i, indexHeader+1));
-              i = indexHeader+1;
-            }
             // Another rule section starts so this is the only way to change the rule name back to null and set false
             else if (data[i]==="|" && canStartNewRuleSection) {
               // console.log("START ANOTHER RULE SECTION!!!!")
@@ -260,19 +257,10 @@ class YalexAnalyzer{
             }
             // Is a rule body, must be inside a rule definition and rule name must not be null
             else if (isRuleBody && insideRuleDefinition && ruleName !== null) {
+              let startIndex = i+1;
               // console.log("RULEBODY");
               i = indexRuleBody;
-              let return_ = "";
-              // Ignore the }
-              indexRuleBody--;
-              // Ignore the spaces between } and everything else
-              while (data[indexRuleBody]===" "){
-                indexRuleBody--;
-              }
-              while (data[indexRuleBody]!==" ") {
-                return_= data[indexRuleBody] + return_;
-                indexRuleBody--;
-              }
+              let return_ = data.slice(startIndex, indexRuleBody-1);
               // Must have just one return so it must be empty
               if (this.rulesSet.get(ruleName)===""){
                 this.rulesSet.set(ruleName,return_.trim());
@@ -280,8 +268,12 @@ class YalexAnalyzer{
               // Any other type doesn't belong and it is treated as an error
               else{
                 throw Error(`Invalid yalex in position ${i}, character ${data[i]}`);
-              }
+              };
               // Here I gotta create an error handling
+            }
+            else if (isHeader && canStartNewRuleSection){
+              this.tokensSet.get("TRAILER").push(data.slice(i, indexHeader+1));
+              i = indexHeader+1;
             }
             else{
               throw Error(`Invalid yalex in position ${i}, character ${data[i]}`);
@@ -294,7 +286,7 @@ class YalexAnalyzer{
         }
       }
       // console.log(this.tokensSet)
-      // console.log(this.rulesSet);
+      console.log(this.rulesSet);
       let keys = Array.from(this.tokensSet.keys());
       // console.log(keys)
       // REPLACE ALL ESCAPED VALUES
@@ -311,7 +303,7 @@ class YalexAnalyzer{
           };
         };
       };
-      // console.log(this.tokensSet);
+      console.log(this.tokensSet);
   };
   createBigTree(){
     this.eliminateRecursion();

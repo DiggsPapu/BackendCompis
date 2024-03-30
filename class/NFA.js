@@ -212,7 +212,7 @@ class NFA {
             new_tsx="q"+steps_moved.toString();
           }
           else {
-            console.log((parseInt(node_toChangeTransitions[j][1].substring(1))+steps_moved).toString())
+            // console.log((parseInt(node_toChangeTransitions[j][1].substring(1))+steps_moved).toString())
             new_tsx= "q"+(parseInt(node_toChangeTransitions[j][1].substring(1))+steps_moved).toString();
           };
           new_transitions.set(new_t,new_tsx);
