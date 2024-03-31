@@ -1,9 +1,11 @@
 const fs = require('fs');
 var YalexAnalyzer = require('../class/YalexAnalyzer.js');
+var GenScanner = require('../class/GenScanner.js');
 const { graphviz } = require('node-graphviz');
 const { drawTreeTokens, drawGraphDFA } = require("./draw.functions.js");
 
 let yalex = null;
+let scanner = null;
 function analyzeYalex(req, res){
     yalex = new YalexAnalyzer(req.body.content);
     graphviz.dot(drawTreeTokens(yalex.ast), 'svg').then((svg) => {fs.writeFileSync('./images/yalexAST.svg', svg);});
@@ -37,7 +39,14 @@ function getDFA(req, res){
         });
     }
 }
+function getScanner(req, res){
+    if (yalex !== null){
+        scanner = new GenScanner(yalex.nfa, yalex.rulesVal);
+        res.status(200).send("done");
+    }
+}
 module.exports = {
     analyzeYalex,
-    getDFA
+    getDFA,
+    getScanner
 }

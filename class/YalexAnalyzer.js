@@ -280,7 +280,7 @@ class YalexAnalyzer{
         }
       }
       // console.log(this.tokensSet)
-      console.log(this.rulesSet);
+      // console.log(this.rulesSet);
       let keys = Array.from(this.tokensSet.keys());
       // console.log(keys)
       // REPLACE ALL ESCAPED VALUES
@@ -356,7 +356,7 @@ class YalexAnalyzer{
     this.regex.regexWithDots = this.generalRegexTokenized;
     this.ast = new SyntaxTree(this.tokenTree[0], this.tokenTree[1], this.regex, this.tokenTree[2]);
     this.directDFA = this.ast.generateDirectDFATokens();
-    console.log(this.rulesVal)
+    // console.log(this.rulesVal)
   };
   tokenize(regex){
     let afds = [];
