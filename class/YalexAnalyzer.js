@@ -57,7 +57,7 @@ class YalexAnalyzer{
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.ruleNameDFA = ast.generateDirectDFATokens();
       // rule body
-      regex = new Regex(`{(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| )+}`)
+      regex = new Regex(`{(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| |({(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| )+}))+}`)
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.ruleBodyDFA = ast.generateDirectDFATokens();
@@ -302,10 +302,11 @@ class YalexAnalyzer{
   createBigTree(){
     this.rulesVal = new Map();
     for (let k = 0; k < Array.from(this.rulesSet.keys()).length; k++ ){
-      let newRegex = this.eliminateRecursion(Array.from(this.rulesSet.keys())[k]);
+      let key = Array.from(this.rulesSet.keys())[k];
+      let newRegex = this.eliminateRecursion(key);
       let regexTokenized = this.tokenize(newRegex);
-      console.log(newRegex)
-      console.log(regexTokenized);
+      // console.log(newRegex)
+      // console.log(regexTokenized);
       let regexWithDots = this.regex.insertDotsInRegexTokenizedWithWords(regexTokenized);
       let postfixRegex = this.regex.infixToPostfixTokenized(regexWithDots);
       this.regex.postfixTokenized = postfixRegex;
@@ -314,7 +315,7 @@ class YalexAnalyzer{
       let ast = new SyntaxTree(tokenTree[0], tokenTree[1], this.regex, tokenTree[2]);
       // console.log(this.ast)
       let directDFA = ast.generateDirectDFATokens();
-      this.rulesVal.set(Array.from(this.rulesSet.keys())[k],[newRegex, regexTokenized, regexWithDots, postfixRegex, tokenTree, regexWithDots, ast, directDFA]);
+      this.rulesVal.set(key,[newRegex, regexTokenized, regexWithDots, postfixRegex, tokenTree, regexWithDots, ast, directDFA, this.rulesSet.get(key)]);
     }
     // Base dfa
     let baseDFA = this.rulesVal.get(Array.from(this.rulesSet.keys())[0])[7];
@@ -322,6 +323,7 @@ class YalexAnalyzer{
     for (let i = 0; i < baseDFA.finalState.length; i++){
       finalS.push(baseDFA.finalState[i].label);
     };
+    // Ignore 1 bc is the base dfa
     for (let k = 1; k < Array.from(this.rulesSet.keys()).length; k++ ){
       // key
       let key = Array.from(this.rulesSet.keys())[k];
@@ -354,6 +356,7 @@ class YalexAnalyzer{
     this.regex.regexWithDots = this.generalRegexTokenized;
     this.ast = new SyntaxTree(this.tokenTree[0], this.tokenTree[1], this.regex, this.tokenTree[2]);
     this.directDFA = this.ast.generateDirectDFATokens();
+    // console.log(this.rulesVal)
   };
   tokenize(regex){
     let afds = [];
