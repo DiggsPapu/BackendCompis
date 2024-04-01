@@ -179,7 +179,9 @@ class NFA {
         state.transitions.delete(arrayTransitions[j]);
         state.transitions.set(arrayTransitions[j], newTransition);
       };
-      this.transitions.set(state.label, state.transitions);
+    };
+    for (let i = 0; i < this.states.length; i++){
+      this.transitions.set(this.states[i].label, this.states[i].transitions);
     };
   }
   addDFA(dfa){

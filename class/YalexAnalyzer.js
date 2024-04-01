@@ -332,7 +332,7 @@ class YalexAnalyzer{
       // final states in the big dfa
       finalS = [];
       // Less init state
-      let counter = baseDFA.states.length-1;
+      let counter = baseDFA.states.length;
       currentDFA.changeStates(counter);
       baseDFA.addDFA(currentDFA);
       for (let i = 0; i < currentDFA.finalState.length; i++){
