@@ -123,6 +123,29 @@ class NFA {
     };
     return false;
   };
+  simulate2 = (input) => {
+    // Inicializar el estado 0
+    console.log(input)
+    let S = this.eClosureT([this.initialState], this);
+    let indexInput = 0;
+    let c = input.charCodeAt(indexInput).toString();
+    
+    while (indexInput<input.length) {
+      S = this.eClosureT(this.move(S, c, this),this);
+      indexInput++;
+      c = input.charCodeAt(indexInput).toString();
+    };
+    for (let indexState = 0; indexState < S.length; indexState++) {
+      if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
+        return [true, S];
+      } 
+      else if (this.checkState(S[indexState].label, this.finalState)){
+        return [true, S];
+      };
+    };
+    return [false, S];
+  };
+
   // YalexSimulation
   yalexSimulate = (input, indexInput) => {
     // console.log(input);

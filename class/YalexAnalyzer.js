@@ -323,6 +323,7 @@ class YalexAnalyzer{
     for (let i = 0; i < baseDFA.finalState.length; i++){
       finalS.push(baseDFA.finalState[i].label);
     };
+    this.rulesVal.get(Array.from(this.rulesSet.keys())[0]).push(finalS);
     // Ignore 1 bc is the base dfa
     for (let k = 1; k < Array.from(this.rulesSet.keys()).length; k++ ){
       // key

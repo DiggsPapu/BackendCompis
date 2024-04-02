@@ -12,14 +12,23 @@ class GenScanner {
         // this.scanner+=this.nfa;
         // this.scanner+=this.regexes;
         // Phase one, pass the definition of nfa and state to this
-        this.developScanner(yalexNFA);
+        this.developScanner(yalexNFA, regexesData);
         // Phase two enter the two automathon, the first one will help to tokenize the txt, and the second one will help 4 the token detection
         
         // Phase three enter the regex data
     }
 
-    async developScanner(yalexNFA) {
+    async developScanner(yalexNFA, regexesData) {
         try {
+          // Rules execution put in stringify
+            let keys = Array.from(regexesData.keys());
+            let regD = {};
+            for (let j = 0; j < keys.length; j++){
+              regD[keys[j]] = {"rule":regexesData.get(keys[j])[8], "finalStates":regexesData.get(keys[j])[9]};
+            }
+            console.log(regD)
+            regD = JSON.stringify(regD);
+            
             // Get the imports
             const stateData = await this.readFileAsync('./class/State.js');
             this.scanner += "\n" + stateData;
@@ -40,12 +49,42 @@ function tokenize(filepath){
     let yalexNFA = ${yalexNFA.serialized};
     // Final States Tokenizer
     let finalStatesT = ${tokenizerA[1]};
-    console.log(finalStatesT);
+    // console.log(finalStatesT);
     // Read the data
     readText(filepath)
     .then(data => {
-        tokenizerNFA = deSerializeAutomathon(tokenizerNFA);
-        console.log(tokenizerNFA);
+      // The regex Data
+      let regD = ${regD};
+      tokenizerNFA = deSerializeAutomathon(tokenizerNFA);
+      let S = null;
+      let accepted = false;
+      let indexTemp = 0;
+      let arrayTokens = [];
+      // Tokenization
+      for (let k = 0; k < data.length; k++){
+        [isWord, indexTemp, S] = tokenizerNFA.yalexSimulate(data, k);
+        let fS = S.map((state)=> {return state.label});
+        if (finalStatesT["anythingElse"].filter(state => fS.includes(state)).length>0){
+          arrayTokens.push(data.slice(k, indexTemp));
+        }
+        k = indexTemp;
+      };
+      // checking the scan of the tokens
+      yalexNFA = deSerializeAutomathon(yalexNFA);
+      for (let k = 0; k < arrayTokens.length; k++){
+        let token = arrayTokens[k];
+        let accepted = false;
+        let S = null;
+        [accepted, S] = yalexNFA.simulate2(token);
+        // If it is accepted eval it
+        if (accepted){
+          
+        }
+        // else show a lexical error
+        else{
+
+        }
+      }
     })
     .catch(err => {
         console.error('Error reading file:', err); // Handle errors
