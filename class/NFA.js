@@ -125,7 +125,6 @@ class NFA {
   };
   simulate2 = (input) => {
     // Inicializar el estado 0
-    console.log(input)
     let S = this.eClosureT([this.initialState], this);
     let indexInput = 0;
     let c = input.charCodeAt(indexInput).toString();
@@ -254,8 +253,6 @@ class NFA {
     this.serialized.states = serializedStates;
     this.serialized.finalStates = finalStates;
     this.serialized = JSON.stringify(this.serialized);
-    // console.log(this.serialized);
-    // console.log(JSON.parse(this.serialized));
   };
   deSerializeAutomathon(serializeAutomathon){
     let parsedSerializeAutomathon = JSON.parse(serializeAutomathon);

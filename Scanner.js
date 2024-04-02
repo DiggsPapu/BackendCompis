@@ -144,7 +144,6 @@ class NFA {
   };
   simulate2 = (input) => {
     // Inicializar el estado 0
-    console.log(input)
     let S = this.eClosureT([this.initialState], this);
     let indexInput = 0;
     let c = input.charCodeAt(indexInput).toString();
@@ -273,8 +272,6 @@ class NFA {
     this.serialized.states = serializedStates;
     this.serialized.finalStates = finalStates;
     this.serialized = JSON.stringify(this.serialized);
-    // console.log(this.serialized);
-    // console.log(JSON.parse(this.serialized));
   };
   deSerializeAutomathon(serializeAutomathon){
     let parsedSerializeAutomathon = JSON.parse(serializeAutomathon);
@@ -321,6 +318,14 @@ function tokenize(filepath){
     .then(data => {
       // The regex Data
       let regD = {"ws":{"rule":"","finalStates":["q1"]},"id":{"rule":"print(\"Diego Alonzo\")","finalStates":["q3"]},"'+'":{"rule":"return PLUS","finalStates":["q6"]},"'*'":{"rule":"number = 2\nnumber2 = 90\nprint(number2%number)","finalStates":["q8"]},"'('":{"rule":"return LPAREN","finalStates":["q10"]},"')'":{"rule":"for(let k = 0; k<20; k++){console.log(k);}","finalStates":["q12"]}};
+      let finalStatesMap = new Map();
+      let keys = Object.keys(regD);
+      for (let k = 0; k < keys.length; k++){
+        let key = keys[k];
+        for (let j = 0; j < regD[key]["finalStates"].length; j++){
+          finalStatesMap.set(regD[key]["finalStates"][j], key);
+        }
+      }
       tokenizerNFA = deSerializeAutomathon(tokenizerNFA);
       let S = null;
       let accepted = false;
@@ -337,26 +342,35 @@ function tokenize(filepath){
       };
       // checking the scan of the tokens
       yalexNFA = deSerializeAutomathon(yalexNFA);
-      console.log(yalexNFA);
       for (let k = 0; k < arrayTokens.length; k++){
         let token = arrayTokens[k];
         let accepted = false;
         let S = null;
         [accepted, S] = yalexNFA.simulate2(token);
         // If it is accepted eval it
-        if (accepted){
-          
+        try{
+          if (accepted){
+            console.log("Token accepted:"+token);
+            console.log("Evaluating rule:")
+            // Get which final State is obtained, we assume the first state in the final states obtained
+            evalRule(regD[finalStatesMap.get(S[0].label)]["rule"]);
+          }
+          // else show a lexical error
+          else{
+            throw new Error("Lexical error, unexpected token: "+token+" regex");
+          }
         }
-        // else show a lexical error
-        else{
-
-        }
+        catch(e){
+          console.error(e);
+        };
       }
     })
     .catch(err => {
         console.error('Error reading file:', err); // Handle errors
-    });   
-           
+    });        
+}
+function evalRule(rule){
+  console.log(eval(rule));
 }
 function deSerializeAutomathon(parsedSerializeAutomathon){
   let alphabet = parsedSerializeAutomathon["alphabet"];

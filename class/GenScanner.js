@@ -55,6 +55,14 @@ function tokenize(filepath){
     .then(data => {
       // The regex Data
       let regD = ${regD};
+      let finalStatesMap = new Map();
+      let keys = Object.keys(regD);
+      for (let k = 0; k < keys.length; k++){
+        let key = keys[k];
+        for (let j = 0; j < regD[key]["finalStates"].length; j++){
+          finalStatesMap.set(regD[key]["finalStates"][j], key);
+        }
+      }
       tokenizerNFA = deSerializeAutomathon(tokenizerNFA);
       let S = null;
       let accepted = false;
@@ -77,19 +85,29 @@ function tokenize(filepath){
         let S = null;
         [accepted, S] = yalexNFA.simulate2(token);
         // If it is accepted eval it
-        if (accepted){
-          
+        try{
+          if (accepted){
+            console.log("Token accepted:"+token);
+            console.log("Evaluating rule:")
+            // Get which final State is obtained, we assume the first state in the final states obtained
+            evalRule(regD[finalStatesMap.get(S[0].label)]["rule"]);
+          }
+          // else show a lexical error
+          else{
+            throw new Error("Lexical error, unexpected token: "+token+" regex");
+          }
         }
-        // else show a lexical error
-        else{
-
-        }
+        catch(e){
+          console.error(e);
+        };
       }
     })
     .catch(err => {
         console.error('Error reading file:', err); // Handle errors
-    });   
-           
+    });        
+}
+function evalRule(rule){
+  console.log(eval(rule));
 }
 function deSerializeAutomathon(parsedSerializeAutomathon){
   let alphabet = parsedSerializeAutomathon["alphabet"];
