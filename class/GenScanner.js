@@ -4,22 +4,22 @@ var SyntaxTree = require("./SyntaxTree");
 var Token = require("./Token");
 var { YalexTokens, asciiUniverses} = require("./YalexTokens");
 class GenScanner {
-    constructor(yalexNFA, regexesData) {
+    constructor(yalexNFA, regexesData, tokensSet) {
         this.ascii = new asciiUniverses();
         this.scanner = ``;
-        // this.nfa = JSON.stringify(yalexNFA);
-        // this.regexes = JSON.stringify(regexesData);
-        // this.scanner+=this.nfa;
-        // this.scanner+=this.regexes;
         // Phase one, pass the definition of nfa and state to this
-        this.developScanner(yalexNFA, regexesData);
-        // Phase two enter the two automathon, the first one will help to tokenize the txt, and the second one will help 4 the token detection
-        
-        // Phase three enter the regex data
+        this.developScanner(yalexNFA, regexesData, tokensSet);
     }
 
-    async developScanner(yalexNFA, regexesData) {
+    async developScanner(yalexNFA, regexesData, tokensSet) {
         try {
+          // Append header and trailer
+          for (let j = 0; j < tokensSet.get("HEADER").length; j++){
+            this.scanner += tokensSet.get("HEADER")[j];
+          }
+          for (let j = 0; j < tokensSet.get("TRAILER").length; j++){
+            this.scanner += tokensSet.get("TRAILER")[j];
+          }
           // Rules execution put in stringify
             let keys = Array.from(regexesData.keys());
             let regD = {};

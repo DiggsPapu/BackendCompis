@@ -42,7 +42,7 @@ function getDFA(req, res){
 }
 function getScanner(req, res){
     if (yalex !== null){
-        scanner = new GenScanner(yalex.nfa, yalex.rulesVal);
+        scanner = new GenScanner(yalex.nfa, yalex.rulesVal, yalex.tokensSet);
         res.status(200).sendFile("/root/BackendCompis/Scanner.js");
     }
 }

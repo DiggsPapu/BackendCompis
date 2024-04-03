@@ -1,3 +1,6 @@
+ let PLUS = 'hola'
+let LPAREN = '('
+let RPAREN = ')'
 
 /**
  * Clase para modelar estados del AFN/AFD
@@ -317,7 +320,7 @@ function tokenize(filepath){
     readText(filepath)
     .then(data => {
       // The regex Data
-      let regD = {"ws":{"rule":"","finalStates":["q1"]},"id":{"rule":"print(\"Diego Alonzo\")","finalStates":["q3"]},"'+'":{"rule":"return PLUS","finalStates":["q6"]},"'*'":{"rule":"number = 2\nnumber2 = 90\nprint(number2%number)","finalStates":["q8"]},"'('":{"rule":"return LPAREN","finalStates":["q10"]},"')'":{"rule":"for(let k = 0; k<20; k++){console.log(k);}","finalStates":["q12"]}};
+      let regD = {"ws":{"rule":"","finalStates":["q1"]},"id":{"rule":"console.log(\"Diego Alonzo\")","finalStates":["q3"]},"'+'":{"rule":"console.log(PLUS)","finalStates":["q6"]},"'*'":{"rule":"number = 2\nnumber2 = 90\nprint(number2%number)","finalStates":["q8"]},"'('":{"rule":"console.log(LPAREN)","finalStates":["q10"]},"')'":{"rule":"for(let k = 0; k<20; k++){console.log(k);}","finalStates":["q12"]}};
       let finalStatesMap = new Map();
       let keys = Object.keys(regD);
       for (let k = 0; k < keys.length; k++){
@@ -411,4 +414,5 @@ function readText(filepath) {
       });
     });
   };
+  // Change the path to get the text
 tokenize("texto.txt");
