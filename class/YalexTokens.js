@@ -68,7 +68,8 @@ class asciiUniverses {
     // console.log(this.SIMPLE_QUOTES);
     this.DEFINITION_DEFINITION = ["( )*(",this.RANGES.join("|"), this.MATH.join("|"), "|", this.DOUBLE_QUOTES, "|", this.SIMPLE_QUOTES, "|", this.OPERATORS.join("|"), "|", this.BRACKETS.join("|"),"|_)+", this.TERMINAL ].join("")
     // console.log(this.DEFINITION_DEFINITION)
-    this.HEADER = ["{( )*(",this.RANGES.join("|"), this.MATH.join("|"), "|", this.DOUBLE_QUOTES, "|", this.SIMPLE_QUOTES, "|", this.OPERATORS.join("|"), "|", this.BRACKETS.join("|"),"|", ["\n", "\t", "\r"].join("|"),"| |_)+}" ].join("")
+    this.HEADER = ["{( )*(",this.RANGES.join("|"), "|",this.MATH.join("|"), "|", this.DOUBLE_QUOTES, "|", this.SIMPLE_QUOTES, "|", this.OPERATORS.join("|"), "|", this.BRACKETS.join("|"),"|", ["\n", "\t", "\r"].join("|"),"| |_]\\n|\\t|\\r)+}" ].join("")
+    
     
   }
 }

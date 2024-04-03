@@ -123,6 +123,28 @@ class NFA {
     };
     return false;
   };
+  simulate2 = (input) => {
+    // Inicializar el estado 0
+    let S = this.eClosureT([this.initialState], this);
+    let indexInput = 0;
+    let c = input.charCodeAt(indexInput).toString();
+    
+    while (indexInput<input.length) {
+      S = this.eClosureT(this.move(S, c, this),this);
+      indexInput++;
+      c = input.charCodeAt(indexInput).toString();
+    };
+    for (let indexState = 0; indexState < S.length; indexState++) {
+      if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
+        return [true, S];
+      } 
+      else if (this.checkState(S[indexState].label, this.finalState)){
+        return [true, S];
+      };
+    };
+    return [false, S];
+  };
+
   // YalexSimulation
   yalexSimulate = (input, indexInput) => {
     // console.log(input);
@@ -179,7 +201,9 @@ class NFA {
         state.transitions.delete(arrayTransitions[j]);
         state.transitions.set(arrayTransitions[j], newTransition);
       };
-      this.transitions.set(state.label, state.transitions);
+    };
+    for (let i = 0; i < this.states.length; i++){
+      this.transitions.set(this.states[i].label, this.states[i].transitions);
     };
   }
   addDFA(dfa){
@@ -203,6 +227,61 @@ class NFA {
     this.transitions.delete("init");
     this.transitions.set("init", this.initialState.transitions);
   };
+  serializeAutomathon(){
+    // It can serialize a dfa or a nfa
+    this.serialized = {};
+    this.serialized.alphabet = this.alphabet;
+    let serializedStates = {};
+    let serializedTransitions = {};
+    let finalStates = {}
+    for (let k = 0; k < this.states.length; k++){
+      let keyTransitions = Array.from(this.states[k].transitions.keys());
+      let serializedTransitions = {}
+      for (let i = 0; i < keyTransitions.length; i++){
+        serializedTransitions[keyTransitions[i]] = this.states[k].transitions.get(keyTransitions[i]);
+      };
+      serializedStates[this.states[k].label.toString()] = serializedTransitions;
+      // If is initial state
+      if (this.initialState.label === this.states[k].label){
+        this.serialized['initialState'] = {"name":this.states[k].label, "transitions": serializedStates[this.states[k].label]};
+      }
+      // If is final state
+      if (this.finalState.filter((state)=> state.label === this.states[k].label).length>0){
+        finalStates[this.states[k].label.toString()] = serializedStates[this.states[k].label];
+      }
+    };
+    this.serialized.states = serializedStates;
+    this.serialized.finalStates = finalStates;
+    this.serialized = JSON.stringify(this.serialized);
+  };
+  deSerializeAutomathon(serializeAutomathon){
+    let parsedSerializeAutomathon = JSON.parse(serializeAutomathon);
+    let alphabet = parsedSerializeAutomathon["alphabet"];
+    let states = [];
+    let finalStates = [];
+    let initialState = null;
+    let keysFinalStates = Object.keys(parsedSerializeAutomathon["finalStates"]);
+    let newTransitions = new Map();
+    for (let stateName in parsedSerializeAutomathon.states){
+      let transitions = new Map();
+      // Get the transitions
+      for (let key in parsedSerializeAutomathon["states"][stateName]){
+        transitions.set(key, parsedSerializeAutomathon["states"][stateName][key]);
+      }
+      let newState = new State(stateName, transitions);
+      states.push(newState);
+      // Get initial state
+      if (stateName === parsedSerializeAutomathon["initialState"]["name"]){
+        initialState = newState;
+      }
+      // Check if is final state
+      if (keysFinalStates.includes(stateName)){
+        finalStates.push(newState);
+      }
+      newTransitions.set(stateName, transitions);
+    }
+    return new NFA(initialState, finalStates, states, alphabet, newTransitions);
+  }
 };
 
 module.exports = NFA

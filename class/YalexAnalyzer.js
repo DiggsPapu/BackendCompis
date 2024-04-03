@@ -26,7 +26,7 @@ class YalexAnalyzer{
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.delimDFA = ast.generateDirectDFATokens();
       // AFD FOR THE HEADER
-      regex = new Regex(this.ascii.HEADER);
+      regex = new Regex(`{(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| |({(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| |\\n|\\t|\\r)+}))+}`)
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.headerDFA = ast.generateDirectDFATokens();
@@ -113,7 +113,7 @@ class YalexAnalyzer{
           this.tokensSet.get("COMMENTARY").push(definition);
         }
         else if (isHeader){
-          this.tokensSet.get("HEADER").push(data.slice(i, indexHeader+1));
+          this.tokensSet.get("HEADER").push(data.slice(i+1, indexHeader));
           i = indexHeader+1;
         }
         else if (isLet){
@@ -276,7 +276,7 @@ class YalexAnalyzer{
         }
         // Any other type doesn't belong and it is treated as an error
         else{
-          throw Error(`Invalid yalex in position ${i}, character ${data[i]}`);
+          throw Error(`Invalid yalex in position ${i}, character ${data.slice(10,i)}`);
         }
       }
       // console.log(this.tokensSet)
@@ -323,6 +323,7 @@ class YalexAnalyzer{
     for (let i = 0; i < baseDFA.finalState.length; i++){
       finalS.push(baseDFA.finalState[i].label);
     };
+    this.rulesVal.get(Array.from(this.rulesSet.keys())[0]).push(finalS);
     // Ignore 1 bc is the base dfa
     for (let k = 1; k < Array.from(this.rulesSet.keys()).length; k++ ){
       // key
@@ -332,7 +333,7 @@ class YalexAnalyzer{
       // final states in the big dfa
       finalS = [];
       // Less init state
-      let counter = baseDFA.states.length-1;
+      let counter = baseDFA.states.length;
       currentDFA.changeStates(counter);
       baseDFA.addDFA(currentDFA);
       for (let i = 0; i < currentDFA.finalState.length; i++){
@@ -356,7 +357,6 @@ class YalexAnalyzer{
     this.regex.regexWithDots = this.generalRegexTokenized;
     this.ast = new SyntaxTree(this.tokenTree[0], this.tokenTree[1], this.regex, this.tokenTree[2]);
     this.directDFA = this.ast.generateDirectDFATokens();
-    // console.log(this.rulesVal)
   };
   tokenize(regex){
     let afds = [];
