@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path')
 var YalexAnalyzer = require('../class/YalexAnalyzer.js');
 var GenScanner = require('../class/GenScanner.js');
 const { graphviz } = require('node-graphviz');
@@ -42,7 +43,7 @@ function getDFA(req, res){
 function getScanner(req, res){
     if (yalex !== null){
         scanner = new GenScanner(yalex.nfa, yalex.rulesVal);
-        res.status(200).send("done");
+        res.status(200).sendFile("/root/BackendCompis/Scanner.js");
     }
 }
 module.exports = {

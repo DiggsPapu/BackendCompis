@@ -26,7 +26,7 @@ class GenScanner {
             for (let j = 0; j < keys.length; j++){
               regD[keys[j]] = {"rule":regexesData.get(keys[j])[8], "finalStates":regexesData.get(keys[j])[9]};
             }
-            console.log(regD)
+            // console.log(regD)
             regD = JSON.stringify(regD);
             
             // Get the imports
@@ -148,6 +148,7 @@ function readText(filepath) {
       });
     });
   };
+  // Change the path to get the text
 tokenize("texto.txt");
 `;
             this.scanner += data;
