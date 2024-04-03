@@ -53,6 +53,8 @@ function tokenize(filepath){
     // Read the data
     readText(filepath)
     .then(data => {
+      // Append and eof
+      data+=' ';
       // The regex Data
       let regD = ${regD};
       let finalStatesMap = new Map();
@@ -79,6 +81,8 @@ function tokenize(filepath){
       };
       // checking the scan of the tokens
       yalexNFA = deSerializeAutomathon(yalexNFA);
+      console.log("Tokens:");
+      console.log(arrayTokens);
       for (let k = 0; k < arrayTokens.length; k++){
         let token = arrayTokens[k];
         let accepted = false;
@@ -86,8 +90,8 @@ function tokenize(filepath){
         [accepted, S] = yalexNFA.simulate2(token);
         // If it is accepted eval it
         try{
-          if (accepted){
-            console.log("Token accepted:"+token);
+          if (accepted && finalStatesMap.get(S[0].label)!==undefined){
+            console.log("Token accepted in rule "+finalStatesMap.get(S[0].label)+": "+token);
             console.log("Evaluating rule:")
             // Get which final State is obtained, we assume the first state in the final states obtained
             evalRule(regD[finalStatesMap.get(S[0].label)]["rule"]);
@@ -187,7 +191,7 @@ tokenize("texto.txt");
         let ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
         let delimDFA = ast.generateDirectDFATokens();
         // Detects anything else
-        regex = new Regex(`(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|{|})+(( )|\n|\r|\t)`);
+        regex = new Regex(`(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|${this.ascii.DOUBLE_QUOTES}|{|})+(( )|\n|\r|\t)`);
         tokenTree = regex.constructTokenTree();
         ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
         let anythingElse = ast.generateDirectDFATokens();

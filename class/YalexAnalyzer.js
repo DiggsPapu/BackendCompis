@@ -16,7 +16,9 @@ class YalexAnalyzer{
     };
     loadAfdCheckers(){
       // AFD FOR THE COMMENTARIES
-      let regex = new Regex("\\(\\* *("+YalexTokens.TILDES+"|"+YalexTokens.CHARACTER+"|"+YalexTokens.NUMBER+"| |\n|\t|\\.|\\+|\\||\\*|,|\\.|-)*( )*\\*\\)");    
+      // console.log("\\(\\* *("+YalexTokens.TILDES+"|"+YalexTokens.CHARACTER+"|"+YalexTokens.NUMBER+"| |\n|\t|\\.|\\+|\\||\\*|,|\\.|-)*( )*\\*\\)");
+      // console.log(this.ascii.COMMENTARIES)
+      let regex = new Regex(this.ascii.COMMENTARIES);    
       let tokenTree = regex.constructTokenTree();
       let ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.commentaryDFA = ast.generateDirectDFATokens();
@@ -169,7 +171,8 @@ class YalexAnalyzer{
               };
             }
             else {
-              throw Error(`Sintax error in position ${i}, character ${data[i]}, expected a definition for the let definition_name`);
+              console.log(this.tokensSet);
+              throw Error(`Sintax error in position ${i}, character ${data.slice(i-10,i)}, expected a definition for the let definition_name:${tokenName}`);
             }
             // console.log(data[i]);
           }
@@ -261,7 +264,7 @@ class YalexAnalyzer{
               }
               // Any other type doesn't belong and it is treated as an error
               else{
-                throw Error(`Invalid yalex in position ${i}, character ${data[i]}`);
+                throw Error(`Invalid yalex in position ${i}, character ${data.slice(i-10, i)}, rule invalid`);
               };
               // Here I gotta create an error handling
             }
@@ -270,13 +273,13 @@ class YalexAnalyzer{
               i = indexHeader+1;
             }
             else{
-              throw Error(`Invalid yalex in position ${i}, character ${data[i]}`);
+              throw Error(`Invalid yalex in position ${i}, character ${data.slice(i-10, i)}, rule expected`);
             }
           }
         }
         // Any other type doesn't belong and it is treated as an error
         else{
-          throw Error(`Invalid yalex in position ${i}, character ${data.slice(10,i)}`);
+          throw Error(`Invalid yalex in position ${i}, character ${data.slice(i-10,i)}`);
         }
       }
       // console.log(this.tokensSet)
@@ -606,7 +609,7 @@ class YalexAnalyzer{
       else if (this.ascii.PUNCTUATION.includes(c));
       // is any character
       else if (c === "_");
-      else {throw new Error (`Invalid pattern ${c}, maybe was not declared that definition`)};
+      else {console.log(this.tokensSet);console.log(this.rulesSet);throw new Error (`Invalid pattern ${regex}, maybe was not declared that definition`)};
       // Must be balanced the brackets
       if (insideBrackets1>1||insideBrackets1<0){
         throw  new Error ("Logic error, unbalanced brackets or brackets anidados");
