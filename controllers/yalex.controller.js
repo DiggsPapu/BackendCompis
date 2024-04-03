@@ -1,5 +1,6 @@
 const fs = require('fs');
-const path = require('path')
+const path = require('path');
+const multer = require('multer'); 
 var YalexAnalyzer = require('../class/YalexAnalyzer.js');
 var GenScanner = require('../class/GenScanner.js');
 const { graphviz } = require('node-graphviz');
@@ -43,7 +44,15 @@ function getDFA(req, res){
 function getScanner(req, res){
     if (yalex !== null){
         scanner = new GenScanner(yalex.nfa, yalex.rulesVal, yalex.tokensSet);
-        res.status(200).sendFile("/root/BackendCompis/Scanner.js");
+        res.download("/root/BackendCompis/Scanner.js", (err) => {
+          if (err) {
+            console.error('Error downloading file:', err);
+            res.status(500).send('Error downloading file.');
+          }
+        });
+    }
+    else{
+        res.status(500).send(`Haven't created the yalex`);
     }
 }
 module.exports = {
