@@ -44,18 +44,11 @@ class GenScanner {
             let data = `
 const fs = require('fs');
 function tokenize(filepath){
-    // Deserialize the tokenizer Automathon
-    let tokenizerNFA = ${tokenizerA[0]};
     // Deserialize the yalex Automathon
     let yalexNFA = ${yalexNFA.serialized};
-    // Final States Tokenizer
-    let finalStatesT = ${tokenizerA[1]};
-    // console.log(finalStatesT);
     // Read the data
     readText(filepath)
     .then(data => {
-      // Append and eof
-      data+=' ';
       // The regex Data
       let regD = ${regD};
       let finalStatesMap = new Map();
@@ -66,40 +59,29 @@ function tokenize(filepath){
           finalStatesMap.set(regD[key]["finalStates"][j], key);
         }
       }
-      tokenizerNFA = deSerializeAutomathon(tokenizerNFA);
+      // Tokenizer with yalex automathon
       let S = null;
       let accepted = false;
       let indexTemp = 0;
-      let arrayTokens = [];
-      // Tokenization
-      for (let k = 0; k < data.length; k++){
-        [isWord, indexTemp, S] = tokenizerNFA.yalexSimulate(data, k);
-        let fS = S.map((state)=> {return state.label});
-        if (finalStatesT["anythingElse"].filter(state => fS.includes(state)).length>0){
-          arrayTokens.push(data.slice(k, indexTemp));
-        }
-        k = indexTemp;
-      };
-      // checking the scan of the tokens
+      let token = null;
       yalexNFA = deSerializeAutomathon(yalexNFA);
-      console.log("Tokens:");
-      console.log(arrayTokens);
-      for (let k = 0; k < arrayTokens.length; k++){
-        let token = arrayTokens[k];
-        let accepted = false;
-        let S = null;
-        [accepted, S] = yalexNFA.simulate2(token);
+      for (let k = 0; k < data.length; k++){
+        token = null;
+        accepted = false;
+        S = null;
+        [accepted, indexTemp, S] = yalexNFA.yalexSimulate2(data, k);
         // If it is accepted eval it
         try{
           if (accepted && finalStatesMap.get(S[0].label)!==undefined){
-            console.log("Token accepted in rule "+finalStatesMap.get(S[0].label)+": "+token);
+            console.log("Token accepted in rule "+finalStatesMap.get(S[0].label)+": \'"+data.slice(k, indexTemp+1)+"\'");
             console.log("Evaluating rule:")
             // Get which final State is obtained, we assume the first state in the final states obtained
             evalRule(regD[finalStatesMap.get(S[0].label)]["rule"]);
+            k = indexTemp;
           }
           // else show a lexical error
           else{
-            throw new Error("Lexical error, unexpected token: "+token+" regex");
+            throw new Error("Lexical error, unexpected token: \'"+data[k]+"\' regex");
           }
         }
         catch(e){

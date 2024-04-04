@@ -146,6 +146,45 @@ class NFA {
   };
 
   // YalexSimulation
+  yalexSimulate2 = (input, indexInput) => {
+    let finalState = [];
+    let lastFinalStateInput = 0;
+    let tempVal = false;
+    // Inicializar el estado 0
+    let S = this.eClosureT([this.initialState], this);
+    // console.log(S)
+    let c = input.charCodeAt(indexInput).toString();
+    // console.log(c);
+    while (indexInput<input.length) {
+      S = this.eClosureT(this.move(S, c, this),this);
+      // console.log(S)
+      for (let indexState = 0; indexState < S.length; indexState++) {
+        if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
+          finalState = S;
+          lastFinalStateInput = indexInput;
+          tempVal = true;
+        } 
+        else if (this.checkState(S[indexState].label, this.finalState)){
+          finalState = S;
+          lastFinalStateInput = indexInput;
+          tempVal = true;
+        };
+      };
+      indexInput++;
+      c = input.charCodeAt(indexInput).toString();
+      // console.log(c);
+    };
+    for (let indexState = 0; indexState < S.length; indexState++) {
+      if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
+        return [true, indexInput, S];
+      } 
+      else if (this.checkState(S[indexState].label, this.finalState)){
+        return [true, indexInput, S];
+      };
+    };
+    return [tempVal, lastFinalStateInput, finalState];
+  };
+  // YalexSimulation
   yalexSimulate = (input, indexInput) => {
     // console.log(input);
     // Inicializar el estado 0
@@ -180,6 +219,7 @@ class NFA {
     };
     return [false, indexInput, S];
   };
+  
   addInitNode(){
     if (this.initialState.label !== "init"){
       let transitions = new Map();
