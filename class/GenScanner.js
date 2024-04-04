@@ -13,6 +13,7 @@ class GenScanner {
 
     async developScanner(yalexNFA, regexesData, tokensSet) {
         try {
+          // console.log(regexesData);
           // Append header and trailer
           for (let j = 0; j < tokensSet.get("HEADER").length; j++){
             this.scanner += tokensSet.get("HEADER")[j];
@@ -26,7 +27,7 @@ class GenScanner {
             for (let j = 0; j < keys.length; j++){
               regD[keys[j]] = {"rule":regexesData.get(keys[j])[8], "finalStates":regexesData.get(keys[j])[9]};
             }
-            // console.log(regD)
+            console.log(regD)
             regD = JSON.stringify(regD);
             
             // Get the imports

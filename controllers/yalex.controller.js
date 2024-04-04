@@ -8,25 +8,43 @@ const { drawTreeTokens, drawGraphDFA } = require("./draw.functions.js");
 
 let yalex = null;
 let scanner = null;
-function analyzeYalex(req, res){
+
+function analyzeYalex(req, res) {
     yalex = new YalexAnalyzer(req.body.content);
-    graphviz.dot(drawTreeTokens(yalex.ast), 'svg').then((svg) => {fs.writeFileSync('./images/yalexAST.svg', svg);});
-    // Send the tree as svg
-    fs.readFile('./images/yalexAST.svg', 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Internal Server Error');
-            return;
-        }
-        // Set the content type to SVG
-        res.set('Content-Type', 'image/svg+xml');
-        // Send the SVG file in the response
-        res.send(data);
+    graphviz.dot(drawTreeTokens(yalex.ast), 'svg').then((svg) => {
+        // Modify the SVG content (change width and height)
+        const modifiedSVG = svg.replace(
+            /<svg width="([\d.]+)pt" height="([\d.]+)pt"/,
+            '<svg width="100%" height="100%"' // Replace with your desired width and height
+        );
+
+        // Write the modified SVG content to a file
+        fs.writeFileSync('./images/yalexAST.svg', modifiedSVG);
+
+        // Read the modified SVG file
+        fs.readFile('./images/yalexAST.svg', 'utf8', (err, data) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Internal Server Error');
+                return;
+            }
+            // Set the content type to SVG
+            res.set('Content-Type', 'image/svg+xml');
+            // Send the modified SVG file in the response
+            res.send(data);
+        });
     });
 };
+
 function getDFA(req, res){
     if (yalex !== null){
-        graphviz.dot(drawGraphDFA(yalex.directDFA), 'svg').then((svg) => {fs.writeFileSync('./images/yalexDFA.svg', svg);});
+        graphviz.dot(drawGraphDFA(yalex.directDFA), 'svg').then((svg) => {
+            const modifiedSVG = svg.replace(
+                /<svg width="([\d.]+)pt" height="([\d.]+)pt"/,
+                '<svg width="100%" height="100%"' // Replace with your desired width and height
+            );
+            fs.writeFileSync('./images/yalexDFA.svg', modifiedSVG);
+        });
         // Send the dfa as svg
         fs.readFile('images/yalexDFA.svg', 'utf8', (err, data) => {
             if (err) {

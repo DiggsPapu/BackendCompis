@@ -257,7 +257,7 @@ class YalexAnalyzer{
               let startIndex = i+1;
               // console.log("RULEBODY");
               i = indexRuleBody;
-              let return_ = data.slice(startIndex, indexRuleBody-1);
+              let return_ = data.slice(startIndex, indexRuleBody);
               // Must have just one return so it must be empty
               if (this.rulesSet.get(ruleName)===""){
                 this.rulesSet.set(ruleName,return_.trim());
