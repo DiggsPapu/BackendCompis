@@ -35,7 +35,7 @@ class asciiUniverses {
     this.MATH = ["\\+", "-", "\\*", "/", "^", "\\(", "\\)", "\\.", "=", ">", "<", "%"]
     this.BRACKETS = ["[","]"]
     this.PARENTHESIS = ["\\(","\\)"]
-    this.OPERATORS = ["\\+", "\\*", "\\(","\\)", "\\.", "\\|", "\\?"]
+    this.OPERATORS = ["\\+", "\\*", "\\(","\\)", "\\.", "\\|", "\\?", "\\#"]
     this.OPERATORS2 = ["\\+", "\\*", "\\(","\\)", "\\.", "\\?"]
     this.CLEAN_OPERATORS = ["+", "*", "(",")", ".", "|", "?"]
     this.ESCAPE_CHARACTERS = ["\\n", "\\t", "\\r", "\\b", "\\f", "\\s"]

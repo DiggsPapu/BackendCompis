@@ -102,28 +102,7 @@ class NFA {
     return U;
   };
 
-  // Inicializar la simulacion
   simulate = (input) => {
-    // Inicializar el estado 0
-    let S = this.eClosureT([this.initialState], this);
-    let indexInput = 0;
-    let c = input[indexInput];
-    while (indexInput<input.length) {
-      S = this.eClosureT(this.move(S, c, this),this);
-      indexInput++;
-      c = input[indexInput];
-    };
-    for (let indexState = 0; indexState < S.length; indexState++) {
-      if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
-        return true;
-      } 
-      else if (this.checkState(S[indexState].label, this.finalState)){
-        return true;
-      };
-    };
-    return false;
-  };
-  simulate2 = (input) => {
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
     let indexInput = 0;
