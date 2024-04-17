@@ -102,6 +102,7 @@ class NFA {
     return U;
   };
 
+
   simulate = (input) => {
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
@@ -125,7 +126,7 @@ class NFA {
   };
 
   // YalexSimulation
-  yalexSimulate2 = (input, indexInput) => {
+  yalexSimulate = (input, indexInput) => {
     let finalState = [];
     let lastFinalStateInput = 0;
     let tempVal = false;
@@ -133,9 +134,10 @@ class NFA {
     let S = this.eClosureT([this.initialState], this);
     // console.log(S)
     let c = input.charCodeAt(indexInput).toString();
-    // console.log(c);
+    // console.log(input[indexInput]);
     while (indexInput<input.length) {
       S = this.eClosureT(this.move(S, c, this),this);
+      // console.log(input[indexInput])
       // console.log(S)
       for (let indexState = 0; indexState < S.length; indexState++) {
         if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
@@ -162,41 +164,6 @@ class NFA {
       };
     };
     return [tempVal, lastFinalStateInput, finalState];
-  };
-  // YalexSimulation
-  yalexSimulate = (input, indexInput) => {
-    // console.log(input);
-    // Inicializar el estado 0
-    let S = this.eClosureT([this.initialState], this);
-    // console.log(S)
-    let c = input[indexInput];
-    // console.log(c);
-    while (indexInput<input.length) {
-      S = this.eClosureT(this.move(S, c, this),this);
-      // console.log(S)
-      for (let indexState = 0; indexState < S.length; indexState++) {
-        if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
-          // console.log("1salgo")
-          return [true, indexInput, S];
-        } 
-        else if (this.checkState(S[indexState].label, this.finalState)){
-          // console.log("2salgo")
-          return [true, indexInput, S];
-        };
-      };
-      indexInput++;
-      c = input[indexInput];
-      // console.log(c);
-    };
-    for (let indexState = 0; indexState < S.length; indexState++) {
-      if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
-        return [true, indexInput, S];
-      } 
-      else if (this.checkState(S[indexState].label, this.finalState)){
-        return [true, indexInput, S];
-      };
-    };
-    return [false, indexInput, S];
   };
   
   addInitNode(){

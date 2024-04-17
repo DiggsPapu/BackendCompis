@@ -126,26 +126,6 @@ class NFA {
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
     let indexInput = 0;
-    let c = input[indexInput];
-    while (indexInput<input.length) {
-      S = this.eClosureT(this.move(S, c, this),this);
-      indexInput++;
-      c = input[indexInput];
-    };
-    for (let indexState = 0; indexState < S.length; indexState++) {
-      if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
-        return true;
-      } 
-      else if (this.checkState(S[indexState].label, this.finalState)){
-        return true;
-      };
-    };
-    return false;
-  };
-  simulate2 = (input) => {
-    // Inicializar el estado 0
-    let S = this.eClosureT([this.initialState], this);
-    let indexInput = 0;
     let c = input.charCodeAt(indexInput).toString();
     
     while (indexInput<input.length) {
@@ -165,7 +145,7 @@ class NFA {
   };
 
   // YalexSimulation
-  yalexSimulate2 = (input, indexInput) => {
+  yalexSimulate = (input, indexInput) => {
     let finalState = [];
     let lastFinalStateInput = 0;
     let tempVal = false;

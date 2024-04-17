@@ -30,12 +30,12 @@ class asciiUniverses {
     this.MINUS=[]
     this.NUMBER = []
     this.UNIVERSE = []
-    this.TERMINAL = "((\n)|(\t)|(\r)|( ))"
+    this.TERMINAL = ["\n","\t","\r"," "]
     this.TILDES = ["á","é","í","ó","ú","Á","É","Í","Ó","Ú"]
-    this.MATH = ["\\+", "-", "\\*", "/", "^", "\\(", "\\)", "\\.", "=", ">", "<", "%"]
+    this.MATH = ["\\+", "-", "\\*", "/", "^", "\\(", "\\)", "\\.", "=", ">", "<", "%", "#"]
     this.BRACKETS = ["[","]"]
     this.PARENTHESIS = ["\\(","\\)"]
-    this.OPERATORS = ["\\+", "\\*", "\\(","\\)", "\\.", "\\|", "\\?", "\\#"]
+    this.OPERATORS = ["\\+", "\\*", "\\(","\\)", "\\.", "\\|", "\\?", "#"]
     this.OPERATORS2 = ["\\+", "\\*", "\\(","\\)", "\\.", "\\?"]
     this.CLEAN_OPERATORS = ["+", "*", "(",")", ".", "|", "?"]
     this.ESCAPE_CHARACTERS = ["\\n", "\\t", "\\r", "\\b", "\\f", "\\s"]
@@ -62,14 +62,15 @@ class asciiUniverses {
     this.UNIVERSE.push("\\_")
     // console.log(this.UNIVERSE);
     this.RANGES = [...this.MAYUS, ...this.MINUS, ...this.NUMBER];
-    this.DOUBLE_QUOTES = ["\"(", this.RANGES.join("|"),"|", this.MATH.join("|"), "|",this.PUNCTUATION.join("|"), "|", this.ESCAPE_CHARACTERS.join("|"), "|", ["\n", "\t", "\r", "\b", "( )"].join("|"),")+\""].join("");
+    this.DOUBLE_QUOTES = `\"(${[...this.RANGES,...this.MATH, ...this.PUNCTUATION,...this.ESCAPE_CHARACTERS,...["\n", "\t", "\r", "\b", "( )"]].join("|")})+\"`;
     // console.log(this.DOUBLE_QUOTES);
     this.SIMPLE_QUOTES = ["'(", this.RANGES.join("|"), "|", this.MATH.join("|"), "|", this.ESCAPE_CHARACTERS.join("|"),"|", this.PUNCTUATION.join("|"), "|", ["\n", "\t", "\r", "\b"].join("|"),"| |\")'"].join("");
     // console.log(this.SIMPLE_QUOTES);
     this.DEFINITION_DEFINITION = ["( )*(",this.RANGES.join("|"), this.MATH.join("|"), "|", this.DOUBLE_QUOTES, "|", this.SIMPLE_QUOTES, "|", this.OPERATORS.join("|"), "|", this.BRACKETS.join("|"),"|_)+", this.TERMINAL ].join("")
     // console.log(this.DEFINITION_DEFINITION)
     this.HEADER = ["{( )*(",this.RANGES.join("|"), "|",this.MATH.join("|"), "|", this.DOUBLE_QUOTES, "|", this.SIMPLE_QUOTES, "|", this.OPERATORS.join("|"), "|", this.BRACKETS.join("|"),"|", ["\n", "\t", "\r"].join("|"),"| |_]\\n|\\t|\\r)+}" ].join("")
-    this.COMMENTARIES = `\\(\\* *(${[...this.RANGES, ...this.TILDES, ...this.PUNCTUATION, ...this.BRACKETS, ...this.MATH, "{|}", this.TERMINAL].join("|")})+( )*\\*\\)`;
+    this.COMMENTARIES = `\\(\\* *(${[...this.RANGES, ...this.PUNCTUATION, ...this.BRACKETS, this.DOUBLE_QUOTES, this.SIMPLE_QUOTES, ...this.TILDES,...["\\+", "-", "/", "^", "\\*", "\\.", "=", ">", "<", "%", "#", "\\|"], ...this.TERMINAL].join("|")})+ *\\*\\)`;
+    console.log(this.COMMENTARIES)
   }
 }
 

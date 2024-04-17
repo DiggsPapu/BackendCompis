@@ -15,58 +15,86 @@ class YalexAnalyzer{
         this.createBigTree();
     };
     loadAfdCheckers(){
+      this.parts = {"COMMENTARIES":{}, "DELIMITERS":{}, "HEADER":{}, "DEFINITION":{},"RULE_NAME":{}, "RULE_BODY":{}, "DEFINITION_NAME":{},"START_RULE":{}, "DEFINITION_DEFINITION":{}};
       // AFD FOR THE COMMENTARIES
-      // console.log("\\(\\* *("+YalexTokens.TILDES+"|"+YalexTokens.CHARACTER+"|"+YalexTokens.NUMBER+"| |\n|\t|\\.|\\+|\\||\\*|,|\\.|-)*( )*\\*\\)");
-      // console.log(this.ascii.COMMENTARIES)
-      let regex = new Regex(this.ascii.COMMENTARIES);    
+      let regex = new Regex(this.ascii.COMMENTARIES);
       let tokenTree = regex.constructTokenTree();
       let ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.commentaryDFA = ast.generateDirectDFATokens();
+      this.generalDFA =this.commentaryDFA;
+      console.log(this.commentaryDFA);
+      this.parts.COMMENTARIES["finalStates"] = this.generalDFA.finalState.map((state)=>state.label);
       // AFD FOR THE DELIMETERS
-      regex = new Regex("(( )|\n|\r|\t)+");
+      regex = new Regex("(( )|\n|\r|\t|\\n|\\t|\\r)+");
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.delimDFA = ast.generateDirectDFATokens();
+      this.delimDFA.changeStates(this.generalDFA.states.length);
+      this.parts.DELIMITERS["finalStates"] = this.delimDFA.finalState.map((state)=>state.label);
+      this.generalDFA.addDFA(this.delimDFA);
+      
       // AFD FOR THE HEADER
       regex = new Regex(`{(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| |({(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| |\\n|\\t|\\r)+}))+}`)
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.headerDFA = ast.generateDirectDFATokens();
+      this.headerDFA.changeStates(this.generalDFA.states.length);
+      this.parts.HEADER["finalStates"] = this.headerDFA.finalState.map((state)=>state.label);
+      this.generalDFA.addDFA(this.headerDFA);
       // AFD'S FOR THE DEFINITION
       // Let +
       regex = new Regex("let +");
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.letDFA = ast.generateDirectDFATokens();
+      this.letDFA.changeStates(this.generalDFA.states.length)
+      this.parts.DEFINITION["finalStates"] = this.letDFA.finalState.map((state)=>state.label);
+      this.generalDFA.addDFA(this.letDFA);
       //  definition_name afd
       regex = new Regex(" *("+YalexTokens.CHARACTER+")("+YalexTokens.CHARACTER+"|"+YalexTokens.NUMBER+"|_)* *=");
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.definitionNameDFA = ast.generateDirectDFATokens();
+      this.definitionNameDFA.changeStates(this.generalDFA.states.length)
+      this.parts.DEFINITION_NAME["finalStates"] = this.definitionNameDFA.finalState.map((state)=>state.label);
+      this.generalDFA.addDFA(this.definitionNameDFA);
       // definition definition afd
       regex = new Regex(this.ascii.DEFINITION_DEFINITION);
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.definitionDefinitionDFA = ast.generateDirectDFATokens();
+      this.definitionDefinitionDFA.changeStates(this.generalDFA.states.length);
+      this.parts.DEFINITION_DEFINITION["finalStates"] = this.definitionDefinitionDFA.finalState.map((state)=>state.label);
+      this.generalDFA.addDFA(this.definitionDefinitionDFA);
       // AFD FOR THE RULES
       regex = new Regex("( )*rule tokens( )*=")
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.startRuleDFA = ast.generateDirectDFATokens();
+      this.startRuleDFA.changeStates(this.generalDFA.states.length)
+      this.parts.START_RULE["finalStates"] = this.startRuleDFA.finalState.map((state)=>state.label);
+      this.generalDFA.addDFA(this.startRuleDFA);
       // rule name
       regex = new Regex(this.ascii.DEFINITION_DEFINITION);
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.ruleNameDFA = ast.generateDirectDFATokens();
+      this.ruleNameDFA.changeStates(this.generalDFA.states.length);
+      this.parts.RULE_NAME["finalStates"] = this.ruleNameDFA.finalState.map((state)=>state.label);
+      this.generalDFA.addDFA(this.ruleNameDFA);
       // rule body
       regex = new Regex(`{(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| |({(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|${this.ascii.SIMPLE_QUOTES}|\n|\t|\r| )+}))+}`)
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.ruleBodyDFA = ast.generateDirectDFATokens();
-      // console.log(this.ruleBodyDFA)
+      this.ruleBodyDFA.changeStates(this.generalDFA.states.length);
+      this.parts.RULE_BODY["finalStates"] = this.ruleBodyDFA.finalState.map((state)=>state.label);
+      this.generalDFA.addDFA(this.ruleBodyDFA);
     };
     // Use an async function to wait for the data
     readFile(data) {
+      let accepted = false;
+      let index = 0; 
       let isCommentary = false;
       let isDelim = false;
       let isHeader = false;
@@ -83,210 +111,42 @@ class YalexAnalyzer{
       this.tokensSet.set("HEADER", []);
       this.tokensSet.set("TRAILER", []);
       this.rulesSet = new Map();
-      let S = null;
+      let S = 0;
       // Handle EOF
       data+="\n";
       let i = 0;
       for (i; i<data.length; i++){
-        [isCommentary, indexComentary, S] = this.commentaryDFA.yalexSimulate(data, i);
-        [isDelim, indexDelim, S] = this.delimDFA.yalexSimulate(data, i);
-        // console.log("start header:")
-        [isHeader, indexHeader, S] = this.headerDFA.yalexSimulate(data, i);
-        [isLet, indexLet, S] = this.letDFA.yalexSimulate(data, i);
-        [startRuleSection, indexStartRule, S] = this.startRuleDFA.yalexSimulate(data, i);
-        // It is a space or some kinda symbol
-        if (isDelim){
-          // console.log("isDelim");
-          i = indexDelim;
-          if (!(this.tokensSet.get("DELIMITERS").includes(data[i]))) {
-            this.tokensSet.get("DELIMITERS").push(data[i]);
-          };
-        }
-        // It is a commentary, it is ignored
-        else if (isCommentary){
-          // console.log("isComment");
-          i = indexComentary;
-          let definition = "";
-          while (!(data[indexComentary]==="(" && data[indexComentary+1]==="*")){
-            definition=data[indexComentary]+definition
-            indexComentary--;
+        // console.log("empieza")
+        let values = this.generalDFA.yalexSimulate(data, i);
+        accepted = values[0];
+        index = values[1];
+        S = values[2];
+        // console.log(this.commentaryDFA.yalexSimulate(data, i))
+        
+        if (accepted){
+          if (this.parts.DELIMITERS["finalStates"].includes(S[0].label)){
+            i = index;
+            if (!(this.tokensSet.get("DELIMITERS").includes(data[i]))) {
+              this.tokensSet.get("DELIMITERS").push(data[i]);
+            };
           }
-          definition=data[indexComentary]+definition;
-          this.tokensSet.get("COMMENTARY").push(definition);
-        }
-        else if (isHeader){
-          this.tokensSet.get("HEADER").push(data.slice(i+1, indexHeader));
-          i = indexHeader+1;
-        }
-        else if (isLet){
-          i = indexLet;
-          // console.log(`indexLet:${indexLet}->${data[indexLet]}`);
-          // console.log(data[indexLet+1])
-          // If is definition, erase the spaces and the = symbols
-          let tokenName = "";
-          let isDefinitionName = false;
-          let indexDefinitionName = indexLet;
-          [isDefinitionName, indexDefinitionName, S] = this.definitionNameDFA.yalexSimulate(data, indexLet);
-          // console.log(`indexLet:${indexDefinitionName}->${data[indexDefinitionName]}`);
-          // console.log(data[indexDefinitionName])
-          // console.log(isDefinitionName)
-          // console.log(S)
-          i = indexDefinitionName;
-          if (isDefinitionName){
-            while (data[indexDefinitionName]==="="||data[indexDefinitionName]===" "||data[indexDefinitionName]==="["){
-              indexDefinitionName--;
-            }
-            while (data[indexDefinitionName]!==" "){
-              tokenName = data[indexDefinitionName]+tokenName;
-              indexDefinitionName--;
-            }
-            // A new set is created
-            if (!this.tokensSet.has(tokenName)){
-              this.tokensSet.set(tokenName, []);
-            }
-            else {
-              throw Error(`The token ${tokenName} has already been defined`);
-            }
-            let isDefinitionDefinition = false;
-            let indexDefinitionDefinition = 0;
-            // For passing =
-            i++;
-            // console.log(`Start definition ${data[i]}${data[i+1]}${data[i+2]}${data[i+3]}${data[i+4]}`);
-            // console.log(this.definitionDefinitionDFA);      
-            [isDefinitionDefinition, indexDefinitionDefinition, S] = this.definitionDefinitionDFA.yalexSimulate(data, i);
-            // console.log(this.definitionDefinitionDFA);
-            i = indexDefinitionDefinition;
-            if (isDefinitionDefinition){
-              let definition = ""
-              // console.log(data[indexDefinitionDefinition])
-              while (data[indexDefinitionDefinition-1]!=="="){
-                definition=data[indexDefinitionDefinition]+definition
-                indexDefinitionDefinition--;
-                // console.log(data[indexDefinitionDefinition])
-              }
-              definition=data[indexDefinitionDefinition]+definition;
-              definition = definition.trim();
-              if (!(this.tokensSet.get(tokenName).includes(definition))) {
-                this.tokensSet.get(tokenName).push(definition);
-              };
-            }
-            else {
-              console.log(this.tokensSet);
-              throw Error(`Sintax error in position ${i}, character ${data.slice(i-10,i)}, expected a definition for the let definition_name:${tokenName}`);
-            }
-            // console.log(data[i]);
+          else if (this.parts.COMMENTARIES["finalStates"].includes(S[0].label)){
+            this.tokensSet.get("COMMENTARY").push(data.slice(i, index+1));
+            i = index;
           }
-          else {
-            throw Error(`Sintax error in position ${i}, character ${data[i]} something is not right in the let definition`);
-          }              
-        }
-        // From this point to what is left it will proceed processing
-        // the rest of the file because we can't return to let section over here
-        else if (startRuleSection){
-          // console.log("START RULE SECTION 1ST")
-          let isRuleName = false;
-          let indexRuleName = 0;
-          let isRuleBody = false;
-          let indexRuleBody = 0;
-          let insideRuleDefinition = false;
-          let ruleName = null;
-          let canStartNewRuleSection = false;
-          isHeader = false;
-          // The +1 its bc is in = position
-          for (i=indexStartRule+1; i < data.length; i++){
-            [isCommentary, indexComentary, S] = this.commentaryDFA.yalexSimulate(data, i);
-            [isDelim, indexDelim, S] = this.delimDFA.yalexSimulate(data, i);
-            [isRuleName, indexRuleName, S] = this.ruleNameDFA.yalexSimulate(data, i);
-            // console.log("tryRuleBody");
-            [isRuleBody, indexRuleBody, S] = this.ruleBodyDFA.yalexSimulate(data, i);
-            [isHeader, indexHeader, S] = this.headerDFA.yalexSimulate(data, i);
-            // It is a space or some kinda symbol
-            if (isDelim){
-              // console.log("isDelim");
-              i = indexDelim;
-              if (!(this.tokensSet.get("DELIMITERS").includes(data[i]))) {
-                this.tokensSet.get("DELIMITERS").push(data[i]);
-              };
-            }
-            // It is a commentary, it is ignored
-            else if (isCommentary){
-              // console.log("isComment");
-              i = indexComentary;
-              let definition = "";
-              while (!(data[indexComentary]==="(" && data[indexComentary+1]==="*")){
-                definition=data[indexComentary]+definition
-                indexComentary--;
-              }
-              definition=data[indexComentary]+definition;
-              this.tokensSet.get("COMMENTARY").push(definition);
-            }
-            // Another rule section starts so this is the only way to change the rule name back to null and set false
-            else if (data[i]==="|" && canStartNewRuleSection) {
-              // console.log("START ANOTHER RULE SECTION!!!!")
-              // console.log(data.slice(i, data.length - 1));
-              insideRuleDefinition = false;
-              ruleName = null;
-              canStartNewRuleSection = false;
-            }
-            // It is a rule name and should not be inside a rule definition
-            else if (isRuleName && !insideRuleDefinition) {
-              ruleName = data.slice(i, indexRuleName);
-              // console.log("RULENAME");
-              // console.log(insideRuleDefinition);
-              i = indexRuleName;
-              insideRuleDefinition = true;
-              // ruleName = null;
-              
-              // indexRuleName--;
-              // while (data[indexRuleName]!==" ") {
-              //   ruleName = data[indexRuleName] + ruleName;
-              //   indexRuleName--;
-              // }
-              // A new set is created
-              if (!this.rulesSet.has(ruleName)){
-                this.rulesSet.set(ruleName.trim(), "");
-              }
-              // Here i must create a error if already has a ruleName
-              else{
-                throw Error(`Invalid yalex in position ${i}, character ${data[i]}, the rule ${ruleName} already has a return value`);
-              }
-              canStartNewRuleSection = true;
-            }
-            // Is a rule body, must be inside a rule definition and rule name must not be null
-            else if (isRuleBody && insideRuleDefinition && ruleName !== null) {
-              let startIndex = i+1;
-              // console.log("RULEBODY");
-              i = indexRuleBody;
-              let return_ = data.slice(startIndex, indexRuleBody);
-              // Must have just one return so it must be empty
-              if (this.rulesSet.get(ruleName)===""){
-                this.rulesSet.set(ruleName,return_.trim());
-              }
-              // Any other type doesn't belong and it is treated as an error
-              else{
-                throw Error(`Invalid yalex in position ${i}, character ${data.slice(i-10, i)}, rule invalid`);
-              };
-              // Here I gotta create an error handling
-            }
-            else if (isHeader && canStartNewRuleSection){
-              this.tokensSet.get("TRAILER").push(data.slice(i, indexHeader+1));
-              i = indexHeader+1;
-            }
-            else{
-              throw Error(`Invalid yalex in position ${i}, character ${data.slice(i-10, i)}, rule expected`);
-            }
+          else if (this.parts.HEADER["finalStates"].includes(S[0].label)){
+            this.tokensSet.get("HEADER").push(data.slice(i+1, index));
+            i = index+1;
           }
+          console.log(this.tokensSet);
+          console.log(this.tokensSet.get('COMMENTARY')[0]);
+          console.log(this.ascii.COMMENTARIES);
         }
-        // Any other type doesn't belong and it is treated as an error
-        else{
-          throw Error(`Invalid yalex in position ${i}, character ${data.slice(i-10,i)}`);
+        else {
+          console.log(this.ascii.COMMENTARIES);
+          throw Error(`Sintax error in position ${i}, character ${data[i]} something is not right in the let definition`);
         }
       }
-      // console.log(this.tokensSet)
-      // console.log(this.rulesSet);
-      let keys = Array.from(this.tokensSet.keys());
-      // console.log(keys)
-      // REPLACE ALL ESCAPED VALUES
       for (let i = 4; i < keys.length; i++) {
         for (let j = 0; j < this.tokensSet.get(keys[i])[0].length; j++){
           if (this.tokensSet.get(keys[i])[0][j-1] === "\\" && 
