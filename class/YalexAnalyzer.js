@@ -22,7 +22,6 @@ class YalexAnalyzer{
       let ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.commentaryDFA = ast.generateDirectDFATokens();
       this.generalDFA =this.commentaryDFA;
-      console.log(this.commentaryDFA);
       this.parts.COMMENTARIES["finalStates"] = this.generalDFA.finalState.map((state)=>state.label);
       // AFD FOR THE DELIMETERS
       regex = new Regex("(( )|\n|\r|\t|\\n|\\t|\\r)+");
@@ -34,7 +33,7 @@ class YalexAnalyzer{
       this.generalDFA.addDFA(this.delimDFA);
       
       // AFD FOR THE HEADER
-      regex = new Regex(`{(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| |({(${this.ascii.MAYUS.join("|")}|${this.ascii.MINUS.join("|")}|${this.ascii.BRACKETS.join("|")}|${this.ascii.NUMBER.join("|")}|\"|\'|${this.ascii.OPERATORS.join("|")}|${this.ascii.TILDES.join("|")}|${this.ascii.ESCAPE_CHARACTERS.join("|")}|${this.ascii.PUNCTUATION.join("|")}|${this.ascii.MATH.join("|")}|\n|\t|\r| |\\n|\\t|\\r)+}))+}`)
+      regex = new Regex(this.ascii.HEADER)
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.headerDFA = ast.generateDirectDFATokens();
@@ -51,7 +50,7 @@ class YalexAnalyzer{
       this.parts.DEFINITION["finalStates"] = this.letDFA.finalState.map((state)=>state.label);
       this.generalDFA.addDFA(this.letDFA);
       //  definition_name afd
-      regex = new Regex(" *("+YalexTokens.CHARACTER+")("+YalexTokens.CHARACTER+"|"+YalexTokens.NUMBER+"|_)* *=");
+      regex = new Regex(this.ascii.DEFINITION_NAME);
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
       this.definitionNameDFA = ast.generateDirectDFATokens();
@@ -94,17 +93,7 @@ class YalexAnalyzer{
     // Use an async function to wait for the data
     readFile(data) {
       let accepted = false;
-      let index = 0; 
-      let isCommentary = false;
-      let isDelim = false;
-      let isHeader = false;
-      let isLet = false;
-      let startRuleSection = false;
-      let indexComentary = 0;
-      let indexDelim = 0;
-      let indexHeader = 0;
-      let indexLet = 0;
-      let indexStartRule = 0;
+      let index = 0;
       this.tokensSet = new Map();
       this.tokensSet.set("COMMENTARY", []);
       this.tokensSet.set("DELIMITERS", []);
@@ -115,14 +104,20 @@ class YalexAnalyzer{
       // Handle EOF
       data+="\n";
       let i = 0;
+      let isLet = false;
+      let isDefinitionBody = false;
+      let tokenName = "";
       for (i; i<data.length; i++){
         // console.log("empieza")
         let values = this.generalDFA.yalexSimulate(data, i);
         accepted = values[0];
         index = values[1];
         S = values[2];
-        // console.log(this.commentaryDFA.yalexSimulate(data, i))
-        
+        console.log(this.generalDFA.yalexSimulate(data, i))
+        // console.log(this.ascii.DEFINITION_DEFINITION);
+        // console.log(this.generalDFA.finalState);
+        // console.log(this.parts.DEFINITION_DEFINITION["finalStates"]);
+        // console.log(this.parts.DELIMITERS["finalStates"]);
         if (accepted){
           if (this.parts.DELIMITERS["finalStates"].includes(S[0].label)){
             i = index;
@@ -138,12 +133,42 @@ class YalexAnalyzer{
             this.tokensSet.get("HEADER").push(data.slice(i+1, index));
             i = index+1;
           }
+          else if (this.parts.DEFINITION["finalStates"].includes(S[0].label) && !isLet && !isDefinitionBody){
+            // Let part started
+            isLet = true;
+            i = index;
+          }
+          // Must be in isLet = True
+          else if (this.parts.DEFINITION_NAME["finalStates"].includes(S[0].label) && isLet && !isDefinitionBody){
+            // Let part started
+            i = index;
+            tokenName = "";
+            while (data[index]==="="||data[index]===" "){
+              index--;
+            }
+            while (data[index]!==" "){
+              tokenName = data[index]+tokenName;
+              index--;
+            }
+            // A new set is created
+            if (!this.tokensSet.has(tokenName)){
+              this.tokensSet.set(tokenName, []);
+            }
+            else {
+              throw Error(`The token ${tokenName} has already been defined`);
+            }
+            isLet = false;
+            isDefinitionBody = true;
+          }
+          // Must be in isDefinitionBody = True
+          else if (this.parts.DEFINITION_DEFINITION["finalStates"].includes(S[0].label) && isDefinitionBody && !isLet){
+            this.tokensSet.get(tokenName).push(data.slice(i, index).trim());
+            i = index;
+            isDefinitionBody = false;
+          }
           console.log(this.tokensSet);
-          console.log(this.tokensSet.get('COMMENTARY')[0]);
-          console.log(this.ascii.COMMENTARIES);
         }
         else {
-          console.log(this.ascii.COMMENTARIES);
           throw Error(`Sintax error in position ${i}, character ${data[i]} something is not right in the let definition`);
         }
       }
@@ -160,7 +185,7 @@ class YalexAnalyzer{
           };
         };
       };
-      // console.log(this.tokensSet);
+      console.log(this.tokensSet);
   };
   createBigTree(){
     this.rulesVal = new Map();
