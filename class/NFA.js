@@ -132,11 +132,16 @@ class NFA {
     let tempVal = false;
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
-    // console.log(S)
     let c = input.charCodeAt(indexInput).toString();
-    // console.log(input[indexInput]);
     while (indexInput<input.length) {
       S = this.eClosureT(this.move(S, c, this),this);
+      // console.log(input[indexInput])
+      // console.log(S.length)
+      if (S.length === 0){
+        // console.log(input.charCodeAt(indexInput).toString())
+        // console.log("\n".charCodeAt(0));
+        return [tempVal, lastFinalStateInput, finalState];
+      }
       // console.log(input[indexInput])
       // console.log(S)
       for (let indexState = 0; indexState < S.length; indexState++) {

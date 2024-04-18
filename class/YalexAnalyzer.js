@@ -1,7 +1,7 @@
 var Regex = require("./Regex");
 var SyntaxTree = require("./SyntaxTree");
 var Token = require("./Token");
-var { YalexTokens, asciiUniverses} = require("./YalexTokens");
+var { asciiUniverses} = require("./YalexTokens");
 class YalexAnalyzer{
     constructor(data){
         this.ascii = new asciiUniverses();
@@ -10,8 +10,6 @@ class YalexAnalyzer{
         this.ast = null;
         this.loadAfdCheckers();
         this.readFile(data);
-        // console.log(this.tokensSet);
-        // console.log(this.rulesSet);
         this.createBigTree();
     };
     loadAfdCheckers(){
@@ -31,7 +29,6 @@ class YalexAnalyzer{
       this.delimDFA.changeStates(this.generalDFA.states.length);
       this.parts.DELIMITERS["finalStates"] = this.delimDFA.finalState.map((state)=>state.label);
       this.generalDFA.addDFA(this.delimDFA);
-      
       // AFD FOR THE HEADER
       regex = new Regex(this.ascii.HEADER)
       tokenTree = regex.constructTokenTree();
@@ -99,11 +96,10 @@ class YalexAnalyzer{
         let values = this.generalDFA.yalexSimulate(data, i);
         accepted = values[0];
         index = values[1];
-        S = values[2].map((state) => state.label)
-        console.log(this.generalDFA.yalexSimulate(data, i))
-        // console.log(this.generalDFA.finalState);
-        // console.log(this.parts.DEFINITION_DEFINITION["finalStates"]);
-        // console.log(this.parts.START_RULE["finalStates"]);
+        S = values[2].map((state) => state.label);
+        // console.log(this.generalDFA.yalexSimulate(data, i))
+        // console.log("Character: _"+data[i]+"_")
+        // console.log(this.ascii.DEFINITION_DEFINITION);
         if (accepted){
           if (this.parts.DELIMITERS["finalStates"].filter(element => S.includes(element)).length > 0){
             i = index;
@@ -134,7 +130,7 @@ class YalexAnalyzer{
           }
           // Another rule section starts so this is the only way to change the rule name back to null and set false
           else if (data[i]==="|" && inRuleSection) {
-            console.log("Empezo otra seccion de rule")
+            // console.log("Empezo otra seccion de rule")
             insideRuleDefinition = false;
             ruleName = null;
             canStartNewRuleSection = false;
@@ -196,6 +192,8 @@ class YalexAnalyzer{
               throw Error(`Invalid yalex in position ${i}, character ${data.slice(i-10, i)}, rule invalid`);
             };
           }
+        // console.log(this.tokensSet);
+        // console.log(this.rulesSet);
         }
         else {
           throw Error(`Sintax error in position ${i}, character ${data[i]} something is not right in the let definition`);
@@ -224,15 +222,12 @@ class YalexAnalyzer{
       let key = Array.from(this.rulesSet.keys())[k];
       let newRegex = this.eliminateRecursion(key);
       let regexTokenized = this.tokenize(newRegex);
-      // console.log(newRegex)
-      // console.log(regexTokenized);
       let regexWithDots = this.regex.insertDotsInRegexTokenizedWithWords(regexTokenized);
       let postfixRegex = this.regex.infixToPostfixTokenized(regexWithDots);
       this.regex.postfixTokenized = postfixRegex;
       let tokenTree= this.regex.constructTokenTree();
       this.regex.regexWithDots = regexWithDots;
       let ast = new SyntaxTree(tokenTree[0], tokenTree[1], this.regex, tokenTree[2]);
-      // console.log(this.ast)
       let directDFA = ast.generateDirectDFATokens();
       this.rulesVal.set(key,[newRegex, regexTokenized, regexWithDots, postfixRegex, tokenTree, regexWithDots, ast, directDFA, this.rulesSet.get(key)]);
     }
@@ -370,8 +365,6 @@ class YalexAnalyzer{
         // this.generalRegexTokenized.push(new Token("(", this.getPrecedence("(")));
         let nextIndex = regex[i+2].charCodeAt(0);
         let previousIndex = regexTokenized[regexTokenized.length-2].value;
-        // console.log(nextIndex)
-        // console.log(previousIndex)
         if (previousIndex<nextIndex){
           for (let j = previousIndex+1; j < nextIndex; j++) {
             regexTokenized.push(new Token(j, -2));
@@ -383,8 +376,7 @@ class YalexAnalyzer{
         } else throw new Error ("Syntax error, range incorrect, range doesn't make sense");
         // this.generalRegexTokenized.push(new Token(")", this.getPrecedence(")")));
       }
-     
-      else {throw new Error(`not recognized in the lexer. ${c}${regex[i+1]}${regex[i+2]}`)};
+      else {throw new Error(`not recognized in the lexer: ${c}. \n${regex.slice(i-4, i+4)}\nIn this regex: ${regex}\nPosition: ${i}`)};
     };
     if (!this.regex.isValidTokens(regex)){
       throw new Error(`Parsing error, something was not right in the regex`);
@@ -523,6 +515,7 @@ class YalexAnalyzer{
       else if (this.ascii.CLEAN_OPERATORS.includes(c));
       else if (this.ascii.MATH.includes(c));
       else if (this.ascii.PUNCTUATION.includes(c));
+      else if (this.ascii.SYMBOLS.includes(c));
       // is any character
       else if (c === "_");
       else {console.log(this.tokensSet);console.log(this.rulesSet);throw new Error (`Invalid pattern ${regex}, maybe was not declared that definition`)};
