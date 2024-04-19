@@ -69,7 +69,7 @@ function tokenize(filepath){
         token = null;
         accepted = false;
         S = null;
-        [accepted, indexTemp, S] = yalexNFA.yalexSimulate2(data, k);
+        [accepted, indexTemp, S] = yalexNFA.yalexSimulate(data, k);
         // If it is accepted eval it
         try{
           if (accepted && finalStatesMap.get(S[0].label)!==undefined){
