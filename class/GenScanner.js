@@ -59,6 +59,7 @@ function tokenize(filepath){
           finalStatesMap.set(regD[key]["finalStates"][j], key);
         }
       }
+      let finalStatesKeys = Array.from( finalStatesMap.keys() );
       // Tokenizer with yalex automathon
       let S = null;
       let accepted = false;
@@ -72,11 +73,12 @@ function tokenize(filepath){
         [accepted, indexTemp, S] = yalexNFA.yalexSimulate(data, k);
         // If it is accepted eval it
         try{
-          if (accepted && finalStatesMap.get(S[0].label)!==undefined){
-            console.log("Token accepted in rule "+finalStatesMap.get(S[0].label)+": \'"+data.slice(k, indexTemp+1)+"\'");
+          if (accepted && finalStatesKeys.filter(element => S.map(state=>state.label).includes(element)).length>0){
+            let fState = finalStatesKeys.filter(element => S.map(state=>state.label).includes(element))[0];
+            console.log("Token accepted in rule->"+finalStatesMap.get(fState)+": '"+data.slice(k, indexTemp+1)+"'");
             console.log("Evaluating rule:")
             // Get which final State is obtained, we assume the first state in the final states obtained
-            evalRule(regD[finalStatesMap.get(S[0].label)]["rule"]);
+            evalRule(regD[finalStatesMap.get(fState)]["rule"]);
             k = indexTemp;
           }
           // else show a lexical error
@@ -136,7 +138,7 @@ function readText(filepath) {
     });
   };
   // Change the path to get the text
-tokenize("texto.txt");
+tokenize("./texts/texto.txt");
 `;
             this.scanner += data;
             // Generate the scanner

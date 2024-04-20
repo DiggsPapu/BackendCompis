@@ -196,7 +196,7 @@ class YalexAnalyzer{
         // console.log(this.rulesSet);
         }
         else {
-          throw Error(`Sintax error in position ${i}, character ${data[i]} something is not right in the let definition`);
+          throw Error(`Sintax error in position ${i}, character ${data[i]} something is not right in text :\n${data.slice(i-4, i+20)}`);
         }
       }
       let keys = Array.from(this.tokensSet.keys());
