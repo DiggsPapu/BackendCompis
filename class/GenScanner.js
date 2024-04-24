@@ -41,11 +41,11 @@ class GenScanner {
             let data = `
 const fs = require('fs');
 let newToken = null;
-function tokenize(filepath){
+async function tokenize(filepath){
     // Deserialize the yalex Automathon
     let yalexNFA = ${yalexNFA.serialized};
     // Read the data
-    readText(filepath)
+    await readText(filepath)
     .then(data => {
       // The regex Data
       let regD = ${regD};
@@ -80,7 +80,6 @@ function tokenize(filepath){
             k = indexTemp;
             // Get which final State is obtained, we assume the first state in the final states obtained
             evalRule(rule);
-            
           }
           // else show a lexical error
           else{

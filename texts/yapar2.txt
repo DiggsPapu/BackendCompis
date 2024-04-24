@@ -1,8 +1,21 @@
-/*Hola*/
-token ['H''A'] TOKEN_2
-token TOKEN_3 TOKEN_4
-IGNORE TOKEN_3
+%token ws
+%token id
+%token plus
+%token lparen rparen
+%token times
+IGNORE ws
+
 %%
-production: TOKEN_1 production1 production2 |TOKEN_2;
-production1: production|TOKEN_4;
-production2: production1|TOKEN_1;
+
+expression:
+    expression plus term
+  | term
+;
+term:
+    term times factor
+  | factor
+;
+factor:
+    lparen expression rparen
+  | id
+;
