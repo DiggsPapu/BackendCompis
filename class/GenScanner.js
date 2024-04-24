@@ -18,9 +18,6 @@ class GenScanner {
           for (let j = 0; j < tokensSet.get("HEADER").length; j++){
             this.scanner += tokensSet.get("HEADER")[j];
           }
-          for (let j = 0; j < tokensSet.get("TRAILER").length; j++){
-            this.scanner += tokensSet.get("TRAILER")[j];
-          }
           // Rules execution put in stringify
             let keys = Array.from(regexesData.keys());
             let regD = {};
@@ -43,6 +40,7 @@ class GenScanner {
             // console.log(this.scanner);
             let data = `
 const fs = require('fs');
+let newToken = null;
 function tokenize(filepath){
     // Deserialize the yalex Automathon
     let yalexNFA = ${yalexNFA.serialized};
@@ -75,11 +73,14 @@ function tokenize(filepath){
         try{
           if (accepted && finalStatesKeys.filter(element => S.map(state=>state.label).includes(element)).length>0){
             let fState = finalStatesKeys.filter(element => S.map(state=>state.label).includes(element))[0];
+            newToken = data.slice(k, indexTemp+1);
             console.log("Token accepted in rule->"+finalStatesMap.get(fState)+": '"+data.slice(k, indexTemp+1)+"'");
-            console.log("Evaluating rule:")
-            // Get which final State is obtained, we assume the first state in the final states obtained
-            evalRule(regD[finalStatesMap.get(fState)]["rule"]);
+            let rule = regD[finalStatesMap.get(fState)]["rule"];
+            console.log("Evaluating rule:"+rule)
             k = indexTemp;
+            // Get which final State is obtained, we assume the first state in the final states obtained
+            evalRule(rule);
+            
           }
           // else show a lexical error
           else{
@@ -141,6 +142,9 @@ function readText(filepath) {
 tokenize("./texts/texto.txt");
 `;
             this.scanner += data;
+            for (let j = 0; j < tokensSet.get("TRAILER").length; j++){
+              this.scanner += tokensSet.get("TRAILER")[j];
+            }
             // Generate the scanner
             fs.writeFile("Scanner.js", this.scanner, (err) => {
                 if (err) {

@@ -209,6 +209,8 @@ class YalexAnalyzer{
             else{
               throw Error(`Invalid yalex in position ${i}, character ${data.slice(i-10, i)}, rule invalid`);
             };
+            // Not anymore in a rule definition, that could lead to a trailer
+            insideRuleDefinition = false;
           }
         // console.log(this.tokensSet);
         // console.log(this.rulesSet);

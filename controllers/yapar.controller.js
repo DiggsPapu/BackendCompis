@@ -1,59 +1,95 @@
 const YalexAnalyzer = require("../class/YalexAnalyzer");
 
-let yaparDefinition = `let number = ['0'-'9']
+let yaparDefinition = `
+(* HEADER STARTS HERE *)
+{
+    let tokens = [];
+    let inProductionSection = false;
+    let ignoreTokens = [];
+    let inProductionDefinition = false;
+    let productions = new Map();
+    let currentProduction = "";
+}
+let commentary = "/*"(number|mayus|minus|delim|symbols)+"*/"
+
+let number = ['0'-'9']
 
 let mayus = ['A'-'Z']
 
 let minus = ['a'-'z']
 
-let delim = ['\n''\r''\t']
+let delim = ['\n''\r''\t'' ']
 
 let symbols = ['!'-'@']
 
-let letter = (minus|mayus)
+let nyterminal = (mayus|minus)(mayus|minus|number|'_')+
 
-let simpleQuotes = '''[' '-'Ú']'''
+let tokenDefinition = '%'"token"((' ')+nyterminal)+
 
-let doubleQuotes = '"'(letter|number)+'"'
-
-let brackets = (simpleQuotes+|doubleQuotes)
-(* Sirve para el token name y para los no terminales *)
-
-let noTerminal = letter(letter|'_'|number)+
-
-let terminal = (letter|simpleQuotes|doubleQuotes|brackets|symbols)+
-
-let tokenDefinition = "token"(' ')+terminal(' 'terminal)*delim
-
-let ignoreToken = "IGNORE"' '+terminal
+let ignoreToken = "IGNORE"' '+nyterminal
 
 let startProductionSection = "%%"
 
-let productionName = noTerminal' '*':'
+let productionName = nyterminal' '*':'
 
-let individualProduction = (' '*(noTerminal|terminal))+
+let individualProduction = (nyterminal)(delim+(nyterminal))*
 
-let productionBody = individualProduction' '*('|'individualProduction' '+)*';'
-
-let commentary = "/*"(number|letter|delim|symbols)+"*/"
 
 rule tokens =
-
 commentary
-| tokenDefinition
-| ignoreToken
-| startProductionSection
-| productionName
-| productionBody
-| ['\n''\r''\t'' ']
+| tokenDefinition {tokens.push(newToken.replace("%token", "").trim());}
+| ignoreToken {ignoreTokens.push(newToken.replace("IGNORE", "").trim());}
+| startProductionSection 
+{
+    if(inProductionSection===false){
+        inProductionSection=true
+    }
+    else{
+        throw new Error("Already in production section, so the yapar is invalid because it has multiple production sections.");
+    };
+}
+| productionName 
+{
+    if(!inProductionDefinition){
+        inProductionDefinition = true;
+        currentProduction = newToken.replace(":", "").trim();
+        productions.set(currentProduction, []);
+    }
+    else{
+        throw new Error("Unexpected a production definition, so the yapar is invalid because the production doesn't have anything.");
+    }
+}
+| individualProduction 
+{
+    productions.get(currentProduction).push(newToken);
+}
+| ';'
+{
+    insideProductionDefinition = false;
+}
+| '|'
+| delim
+{
+
+}
+(* TRAILER *)
+{
+    console.log(tokens);
+    console.log(ignoreTokens);
+    console.log(productions);
+}
 `
-function getYapar(){
+
+function postYapar(){
+    // Obtain the yalex that gets the definition of the yapar
     let yalex = new YalexAnalyzer(yaparDefinition);
+    
     // yalex.nfa, yalex.rulesVal, yalex.tokensSet
     // console.log(yalex.nfa);
     // console.log(yalex.rulesVal);
     // console.log(yalex.tokensSet);
 }
+
 module.exports = {
-    getYapar
+    postYapar
 }

@@ -1,6 +1,6 @@
 /*Hola*/
-token TOKEN_1 TOKEN_2
-token TOKEN_3 TOKEN_4
+%token TOKEN_1 TOKEN_2
+%token TOKEN_3 TOKEN_4
 IGNORE TOKEN_3
 %%
 production: TOKEN_1 production1 production2 |TOKEN_2;
