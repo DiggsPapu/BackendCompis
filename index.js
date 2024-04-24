@@ -6,6 +6,7 @@ var cors = require('cors');
 
 var automatonRoutes = require('./routes/automaton.route');
 var yalexRoutes = require('./routes/yalex.route');
+var yaparRoutes = require('./routes/yapar.route');
 
 const port = process.env.PORT || 4000;
 var app = express();
@@ -31,4 +32,5 @@ app.listen(port, ()=>
 
 app.use(automatonRoutes);
 app.use(yalexRoutes);
+app.use(yaparRoutes);
 module.exports = app;

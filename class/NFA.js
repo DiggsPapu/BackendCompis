@@ -129,7 +129,7 @@ class NFA {
   yalexSimulate = (input, indexInput) => {
     let initialIndex = indexInput;
     let finalState = [];
-    let lastFinalStateInput = 0;
+    let lastFinalStateInput = indexInput;
     let tempVal = false;
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
@@ -143,6 +143,7 @@ class NFA {
         // console.log("\n".charCodeAt(0));
         // console.log(input.slice(initialIndex, indexInput));
         // console.log("Unexpected token: "+input[indexInput])
+        
         return [tempVal, lastFinalStateInput, finalState];
       }
       // console.log(input[indexInput])

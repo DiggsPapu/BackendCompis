@@ -50,7 +50,7 @@ class asciiUniverses {
     this.COMMENTARIES = `\\(\\* *(${[...this.RANGES, ...this.PUNCTUATION, ...this.BRACKETS, this.DOUBLE_QUOTES, this.SIMPLE_QUOTES, ...this.TILDES,...["\\+", "-", "/", "^", "\\*", "\\.", "=", ">", "<", "%", "#", "\\|"], ...this.TERMINAL].join("|")})+ *\\*\\)`;
     
     this.DEFINITION_NAME = ` *(${[...this.MAYUS, ...this.MINUS, "_"].join("|")})(${[...this.RANGES, "_"].join("|")})* *=`
-    // ` *${[...this.MAYUS, ...this.MINUS, "_"].join("|")}(${[...this.RANGES, "_"].join("|")})* *=`
+    this.RULE_NAME = `(${[...this.MAYUS, ...this.MINUS, "_"].join("|")})+(${[...this.RANGES, "_"].join("|")})*`
   }
 }
 

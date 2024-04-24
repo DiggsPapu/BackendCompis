@@ -54,7 +54,15 @@ class YalexAnalyzer{
       this.definitionNameDFA.changeStates(this.generalDFA.states.length)
       this.parts.DEFINITION_NAME["finalStates"] = this.definitionNameDFA.finalState.map((state)=>state.label);
       this.generalDFA.addDFA(this.definitionNameDFA);
-      // definition definition afd | rule_name
+      // AFD FOR THE RULE_NAME (not anonymous)
+      regex = new Regex(this.ascii.RULE_NAME);
+      // console.log(this.ascii.RULE_NAME);
+      tokenTree = regex.constructTokenTree();
+      ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
+      this.ruleNameDFA = ast.generateDirectDFATokens();
+      this.ruleNameDFA.changeStates(this.generalDFA.states.length);
+      this.parts.RULE_NAME["finalStates"] = this.ruleNameDFA.finalState.map((state)=>state.label);
+      // definition definition afd | anonymous rule name
       regex = new Regex(this.ascii.DEFINITION_DEFINITION);
       tokenTree = regex.constructTokenTree();
       ast = new SyntaxTree(tokenTree[0], tokenTree[1], regex, tokenTree[2]);
@@ -92,6 +100,7 @@ class YalexAnalyzer{
       let insideRuleDefinition = false;
       let ruleName = null;
       let canStartNewRuleSection = false;
+      let anonymousC = 0;
       for (i; i<data.length; i++){
         let values = this.generalDFA.yalexSimulate(data, i);
         accepted = values[0];
@@ -130,7 +139,6 @@ class YalexAnalyzer{
           }
           // Another rule section starts so this is the only way to change the rule name back to null and set false
           else if (data[i]==="|" && inRuleSection) {
-            // console.log("Empezo otra seccion de rule")
             insideRuleDefinition = false;
             ruleName = null;
             canStartNewRuleSection = false;
@@ -164,13 +172,23 @@ class YalexAnalyzer{
             isDefinitionBody = false;
           }
           // Rule name
-          else if ((this.parts.DEFINITION_NAME["finalStates"].filter(element => S.includes(element)).length > 0||this.parts.DEFINITION_DEFINITION["finalStates"].filter(element => S.includes(element)).length > 0)&& inRuleSection && !insideRuleDefinition && !canStartNewRuleSection){
+          else if ((this.parts.RULE_NAME["finalStates"].filter(element => S.includes(element)).length > 0||this.parts.DEFINITION_DEFINITION["finalStates"].filter(element => S.includes(element)).length > 0)&& inRuleSection && !insideRuleDefinition && !canStartNewRuleSection){
             ruleName = data.slice(i, index).trim();
             i = index;
             insideRuleDefinition = true;
             // A new set is created
             if (!this.rulesSet.has(ruleName)){
-              this.rulesSet.set(ruleName, "");
+              // Check if the ruleName is a regex, if so create something like anonymous: TOKEN_0, TOKEN_1, etc
+              if (this.ruleNameDFA.yalexSimulate(ruleName, 0)[0]===false){
+                let anonymousName = `TOKEN_${anonymousC}`;
+                this.rulesSet.set(anonymousName, "");
+                this.tokensSet.set(anonymousName, [ruleName]);
+                ruleName = anonymousName;
+                anonymousC++;
+              }
+              else{
+                this.rulesSet.set(ruleName, "");
+              };
             }
             // Here i must create a error if already has a ruleName
             else{
