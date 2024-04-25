@@ -404,11 +404,9 @@ function readText(filepath) {
       });
     });
   };
-  // Change the path to get the text
-tokenize("./texts/yapar2.txt");
 
-async function tokenizeYapar(){
-  await tokenize("./texts/yapar2.txt");
+async function tokenizeYapar(filepath){
+  await tokenize(filepath);
   return [tokens, ignoreTokens, productions];
 }
 module.exports = {tokenizeYapar};
