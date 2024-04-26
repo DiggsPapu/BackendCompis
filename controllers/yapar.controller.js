@@ -24,20 +24,6 @@ async function postFiles(data){
     if (keys.filter(token => tokens.includes(token)).length !== tokens.length){
         throw Error(`Some token is not defined`);
     };
-    // let arrayProductions = new Map();
-    // This makes an array from each production from a nonTerminal
-    // keys = Array.from(productions.keys());
-    // for (let k = 0; k < keys.length; k++){
-    //   let noTerminal = keys[k];
-    //   console.log(noTerminal);
-    //   let newProductions = [];
-    //   // console.log(productions.get(noTerminal))
-    //   for (let j = 0; j < productions.get(noTerminal).length; j++){
-    //     let production = productions.get(noTerminal)[j];
-    //     newProductions.push(production.split(" "));
-    //   }
-    //   arrayProductions.set(noTerminal, newProductions);
-    // };
     let yapar = new YaPar(tokens, ignoreTokens, productions);
     
     
