@@ -1,7 +1,9 @@
 class Item{
-    constructor(name, items){
+    constructor(name, pos, production, ignore){
         this.name = name;
-        this.items = items;
+        this.pos = pos;
+        this.production = production;
+        this.ignore = ignore;
     }
 }
-module.exports = Item;
+module.exports = Item
