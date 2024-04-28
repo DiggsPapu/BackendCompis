@@ -6,8 +6,9 @@ var cors = require('cors');
 
 var automatonRoutes = require('./routes/automaton.route');
 var yalexRoutes = require('./routes/yalex.route');
+var yaparRoutes = require('./routes/yapar.route');
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 5960;
 var app = express();
 app.use(cors());
 app.set('views', path.join(__dirname,'views'));
@@ -26,9 +27,10 @@ app.use((req, res, next) => {
 });
 
 app.listen(port, ()=>
-    console.log("App listening on port 4000")
+    console.log("App listening on port 5960")
     );
 
 app.use(automatonRoutes);
 app.use(yalexRoutes);
+app.use(yaparRoutes);
 module.exports = app;

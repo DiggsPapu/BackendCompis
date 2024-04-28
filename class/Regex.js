@@ -197,18 +197,18 @@ class Regex {
           tokens.push(token);
           break;
         case "\\":
-          // El backslash convierte a un operador en un simbolo.
+          // El backslash convierte a un operador en un simbolo, en ascii
           if (this.isOperator(regex[c+1])){
-            tokens.push(new Token(regex[c+1], -2))
+            tokens.push(new Token(regex.charCodeAt(c+1).toString(), -2))
             c++;
           }
           // El backslash es un simbolo
           else{
-            tokens.push(new Token("\\", -2));
+            tokens.push(new Token("\\".charCodeAt(0).toString(), -2));
           }
           break;
         default:
-          token = new Token(element, -2);
+          token = new Token(element.charCodeAt(0).toString(), -2);
           tokens.push(token);
           break;  
       };

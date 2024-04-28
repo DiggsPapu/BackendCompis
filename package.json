@@ -19,7 +19,7 @@
     "util": "^0.12.5"
   },
   "scripts": {
-    "client": " yarn --cwd client run start",
+    "client": "nodemon index.js",
     "server": "nodemon index",
     "start": "concurrently \"yarn run server\" \"yarn run client\""
   }

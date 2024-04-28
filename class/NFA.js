@@ -102,28 +102,8 @@ class NFA {
     return U;
   };
 
-  // Inicializar la simulacion
+
   simulate = (input) => {
-    // Inicializar el estado 0
-    let S = this.eClosureT([this.initialState], this);
-    let indexInput = 0;
-    let c = input[indexInput];
-    while (indexInput<input.length) {
-      S = this.eClosureT(this.move(S, c, this),this);
-      indexInput++;
-      c = input[indexInput];
-    };
-    for (let indexState = 0; indexState < S.length; indexState++) {
-      if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
-        return true;
-      } 
-      else if (this.checkState(S[indexState].label, this.finalState)){
-        return true;
-      };
-    };
-    return false;
-  };
-  simulate2 = (input) => {
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
     let indexInput = 0;
@@ -146,17 +126,27 @@ class NFA {
   };
 
   // YalexSimulation
-  yalexSimulate2 = (input, indexInput) => {
+  yalexSimulate = (input, indexInput) => {
+    let initialIndex = indexInput;
     let finalState = [];
-    let lastFinalStateInput = 0;
+    let lastFinalStateInput = indexInput;
     let tempVal = false;
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
-    // console.log(S)
     let c = input.charCodeAt(indexInput).toString();
-    // console.log(c);
     while (indexInput<input.length) {
       S = this.eClosureT(this.move(S, c, this),this);
+      // console.log(input[indexInput])
+      // console.log(S.length)
+      if (S.length === 0){
+        // console.log(input.charCodeAt(indexInput).toString())
+        // console.log("\n".charCodeAt(0));
+        // console.log(input.slice(initialIndex, indexInput));
+        // console.log("Unexpected token: "+input[indexInput])
+        
+        return [tempVal, lastFinalStateInput, finalState];
+      }
+      // console.log(input[indexInput])
       // console.log(S)
       for (let indexState = 0; indexState < S.length; indexState++) {
         if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
@@ -183,41 +173,6 @@ class NFA {
       };
     };
     return [tempVal, lastFinalStateInput, finalState];
-  };
-  // YalexSimulation
-  yalexSimulate = (input, indexInput) => {
-    // console.log(input);
-    // Inicializar el estado 0
-    let S = this.eClosureT([this.initialState], this);
-    // console.log(S)
-    let c = input[indexInput];
-    // console.log(c);
-    while (indexInput<input.length) {
-      S = this.eClosureT(this.move(S, c, this),this);
-      // console.log(S)
-      for (let indexState = 0; indexState < S.length; indexState++) {
-        if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
-          // console.log("1salgo")
-          return [true, indexInput, S];
-        } 
-        else if (this.checkState(S[indexState].label, this.finalState)){
-          // console.log("2salgo")
-          return [true, indexInput, S];
-        };
-      };
-      indexInput++;
-      c = input[indexInput];
-      // console.log(c);
-    };
-    for (let indexState = 0; indexState < S.length; indexState++) {
-      if (typeof(this.finalState)!==Array && S[indexState].label === this.finalState.label){
-        return [true, indexInput, S];
-      } 
-      else if (this.checkState(S[indexState].label, this.finalState)){
-        return [true, indexInput, S];
-      };
-    };
-    return [false, indexInput, S];
   };
   
   addInitNode(){
