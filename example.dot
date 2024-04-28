@@ -1,8 +1,0 @@
-digraph items{
-    rankdir=LR;
-    size=20
-    node [shape = box ,label = "factor->lparen expression . rparen\nexpression->expression . plus term\n"]; I0;
-    node [shape = box ,label = "factor->lparen expression . rparen\nexpression->expression . plus term\n"]; I1;
-    I0->I1;
-
-}

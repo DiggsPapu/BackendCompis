@@ -23,7 +23,7 @@ async function postFiles(data, res){
     console.log(ignoreTokens)
     console.log(productions)
     // Check if the yapar tokens exist in the yalex file tokens
-    if (keys.filter(token => tokens.includes(token)).length !== tokens.length){
+    if (keys.filter(token => !tokens.includes(token)).length>0){
         throw Error(`Some token is not defined`);
     };
     let yapar = new YaPar(tokens, ignoreTokens, productions);

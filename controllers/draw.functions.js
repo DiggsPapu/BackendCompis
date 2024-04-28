@@ -311,10 +311,11 @@ const drawGraphTokens = (nfa) => {
   };
   
   function drawGraphItems(items, transitions){
-    string_graph = `digraph items{rankdir=LR;\nsize="20,20;\n"`;
+    let string_graph = `digraph items{rankdir=LR;\nsize="20,20;\n"`;
+    let transitionText = ""
     for (let k = 0; k < items.length; k++){
       // Creating the nodes
-      string_graph+=`node[shape = box, label=\"`;
+      string_graph+=`node[shape = box, label=\"I${k}\n`;
       for (let j = 0; j < items[k].length; j++){
         let item = items[k][j];
         let stringProduction = item.production.join(" ").split(" ");
@@ -322,14 +323,14 @@ const drawGraphTokens = (nfa) => {
         stringProduction.splice(item.pos, 0, ".");
         string_graph += `${item.name}->${stringProduction.join(" ")}\n`;
       }
-      string_graph+=`\"]; I${k};\n`;
+      string_graph+=`\"] I${k};\n`;
       // Create the transitions
       let keys = Array.from(transitions.get(k).keys());
       keys.map((key)=>{
-        string_graph+=`I${k}->I${transitions.get(k).get(key)} [label = ${key}];\n`
+        transitionText+=`I${k}->I${transitions.get(k).get(key)} [label = ${key}];\n`
       });
     }
-    string_graph+='}'
+    string_graph+=transitionText+'}'
     return string_graph;
   }
 const drawTreeTokensAscii = (tree) =>{
