@@ -7,72 +7,80 @@ class YaPar{
         this.productions = productions;
         this.items = [];
         this.addInitialState();
-        // console.log(this.items[0])
-        let value = this.closure(this.items[0]);
-        // console.log(value)
-        for (let i = 0; i < value.length; i++){
-            console.log(value[i]);
-        }
-        this.countItems = 0;
-        console.log("_____________________________")
-        value = this.goTo([value], "lparen");
-        for (let i = 0; i < value.length; i++){
-            console.log(value[i]);
-        }
+        this.constructCanonical();
     }
     addInitialState(){
         let items = [];
-        items.push(new Item("E\'", 0, [Array.from(this.productions.keys())[0]], false));
+        items.push(new Item("E\'", 0, [Array.from(this.productions.keys())[0]]));
         this.items.push(items);
     }
-    itemInArray(C, item){
-        for (let k = 0; k < C.length; k++){
-            let comparedItem = C[k];
-            if (comparedItem.name !== item.name){
-                for (let j = 0; j < comparedItem.items.length; j++){
-
-                }
-            }
-        }
-        return false;
+    setItemsInArray(C, setItems) {
+        return C.some(items => {
+            return items.every(item => {
+                return setItems.some(item1 => {
+                    return JSON.stringify(item1) === JSON.stringify(item);
+                });
+            });
+        });
     }
     constructCanonical(){
         let C = [this.closure(this.items[0])];
-        let grammarSymbols = this.tokens.filter((token)=>!this.ignoreTokens.has(token));
-        while (true){
+        let grammarSymbols = ["E\'", ...Array.from(this.productions.keys()), ...this.tokens.filter((token)=>!this.ignoreTokens.includes(token))];
+        console.log(grammarSymbols);
+        let lengthC = 0;
+        while (lengthC!==C.length){
+            lengthC = C.length
             for (let k = 0; k < C.length; k++){
-                let item = C[k];
+                let setItem = C[k];
+                // console.log(setItem);
                 for (let j = 0; j < grammarSymbols.length; j++){
                     let symbol = grammarSymbols[j];
-
-                    // if (C.filter((item)=>item.items()))
+                    // console.log(symbol);
+                    let newSetItems = this.goTo(setItem, symbol);
+                    // console.log(newSetItems)
+                    if (newSetItems.length >0 && !this.setItemsInArray(C, newSetItems)){
+                        C.push(newSetItems);
+                    }
                 }
+            }
+        }
+        this.items = C;
+        for (let k = 0; k < this.items.length; k++){
+            console.log(`I${k}: `);
+            for (let j = 0; j < this.items[k].length; j++){
+                console.log(this.items[k][j]);
             }
         }
     }
     goTo(I, X){
         let newItem = [];
         for (let k = 0; k < I.length; k++){
-            let itemsList = I[k];
-            for (let j = 0; j < itemsList.length; j++){
-                // console.log("hola")
-                // If the next value is equal to X that is YNTerminal
-                if (itemsList[j].production[itemsList[j].pos]===X){
-                    // console.log(itemsList[j])
-                    // console.log(itemsList[j].production)
-                    // console.log(itemsList[j].production[itemsList[j].pos+1])
-                    let newTerminal =  new Item(itemsList[j].name, itemsList[j].pos+1, itemsList[j].production, false);
-                    let newItem1 = [newTerminal];
-                    // console.log(newItem.items);
-                    
-                    newItem.push(newTerminal);
-                    newItem = this.closure(newItem1);
-                    // console.log("Return:")
-                    // console.log(item2)
-                    // newItem = [...newItem,...item2];
-                    // console.log(newItem)
+            // console.log("hola")
+            let item = I[k];
+            // console.log(item)
+            if (item.production[item.pos]===X){
+                // console.log(itemsList[j])
+                // console.log(itemsList[j].production)
+                // console.log(itemsList[j].production[itemsList[j].pos+1])
+                let newTerminal =  new Item(item.name, item.pos+1, item.production);
+                let newItem1 = [newTerminal];
+                // console.log(newItem.items);
+                
+                newItem.push(newTerminal);
+                let newItems = this.closure(newItem1);
+                // Append the values checking they are unique and haven't been appended before
+                for (let j = 0; j < newItems.length; j++){
+                    if (newItem.filter((item)=>
+                    item.pos === newItems[j].pos && item.production.join(" ") === newItems[j].production.join(" ")
+                    ).length===0){
+                        newItem.push(newItems[j]);
+                    }
                 }
-                // console.log("Valor: ");
+                
+
+                // console.log("Return:")
+                // console.log(item2)
+                // newItem = [...newItem,...item2];
                 // console.log(newItem)
             }
         }
@@ -81,10 +89,9 @@ class YaPar{
         return newItem;
     }
     closure(I){
-        // console.log("enter closure")
+        // console.log("enter closure");
         let J = I;
         let jItems = 0;
-        let counter = 0;
         // console.log(J.items.length)
         while (jItems !== J.length){
             // Get the length of J, while there are no more items added to J in 1 round
@@ -93,7 +100,8 @@ class YaPar{
                 let item = J[k];
                 let nyTerminal = item.production[item.pos];
                 // In case is a not terminal
-                if (!this.tokens.includes(nyTerminal)){
+                if (!this.tokens.includes(nyTerminal) && nyTerminal !== undefined){
+                    // console.log(nyTerminal)
                     let productions = this.productions.get(nyTerminal);
                     // console.log(this.productions)
                     for (let j = 0; j < productions.length; j++){
@@ -102,19 +110,20 @@ class YaPar{
                     //     console.log(J.items.filter((ynterminal)=>
                     //     ynterminal.pos === 0  && ynterminal.production.join(" ") === productions[j].join(" ")
                     // ).length>0)
+                    // If the item is not already in the set
                         if (J.filter((ynterminal)=>
                             ynterminal.pos === 0  && ynterminal.production.join(" ") === productions[j].join(" ")
                         ).length===0){
-                            J.push(new Item(nyTerminal, 0, productions[j], false))
+                            J.push(new Item(nyTerminal, 0, productions[j]))
                         }
                     }
                 }
+                // If it has an ignore token it throws an error
                 else if (this.ignoreTokens.includes(nyTerminal)){
                     throw Error(`The grammar is incorrect, it has an ignore token: ${nyTerminal}`)
                 }
             }
         }
-        counter++;
         return J;
     }
     
