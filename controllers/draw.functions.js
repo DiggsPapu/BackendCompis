@@ -309,6 +309,29 @@ const drawGraphTokens = (nfa) => {
     };
     return [string_graph, counter];
   };
+  
+  function drawGraphItems(items, transitions){
+    string_graph = `digraph items{rankdir=LR;\nsize="20,20;\n"`;
+    for (let k = 0; k < items.length; k++){
+      // Creating the nodes
+      string_graph+=`node[shape = box, label=\"`;
+      for (let j = 0; j < items[k].length; j++){
+        let item = items[k][j];
+        let stringProduction = item.production.join(" ").split(" ");
+        // console.log(item)
+        stringProduction.splice(item.pos, 0, ".");
+        string_graph += `${item.name}->${stringProduction.join(" ")}\n`;
+      }
+      string_graph+=`\"]; I${k};\n`;
+      // Create the transitions
+      let keys = Array.from(transitions.get(k).keys());
+      keys.map((key)=>{
+        string_graph+=`I${k}->I${transitions.get(k).get(key)} [label = ${key}];\n`
+      });
+    }
+    string_graph+='}'
+    return string_graph;
+  }
 const drawTreeTokensAscii = (tree) =>{
     let counter = 0;
     let dotStr = "digraph tree {\n";
@@ -340,12 +363,12 @@ const drawTreeTokensAscii = (tree) =>{
     };
     return [string_graph, counter];
   };
-
   module.exports = {
     drawGraph,
     drawGraphDFA,
     drawGraphTokens,
     drawTreeNodeTokens,
     drawTreeNodeTokensAscii,
-    drawTreeTokens
+    drawTreeTokens,
+    drawGraphItems,
   }

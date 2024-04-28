@@ -72,14 +72,14 @@ class YaPar{
             }
         }
         this.items = C;
-        for (let k = 0; k < this.items.length; k++){
-            console.log(`I${k}: `);
-            for (let j = 0; j < this.items[k].length; j++){
-                console.log(this.items[k][j]);
-            }
-            console.log("transitions:")
-            console.log(this.transitions.get(k));
-        }
+        // for (let k = 0; k < this.items.length; k++){
+        //     console.log(`I${k}: `);
+        //     for (let j = 0; j < this.items[k].length; j++){
+        //         console.log(this.items[k][j]);
+        //     }
+        //     console.log("transitions:")
+        //     console.log(this.transitions.get(k));
+        // }
     }
     goTo(I, X){
         let newItem = [];

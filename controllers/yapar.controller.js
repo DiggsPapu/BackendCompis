@@ -2,8 +2,10 @@ const fs = require('fs');
 const YalexAnalyzer = require("../class/YalexAnalyzer");
 const YaparTokenizer = require("../utils/YaparScanner");
 const YaPar = require('../class/YaPar');
+const { drawGraphItems } = require('./draw.functions');
+const { graphviz } = require('node-graphviz');
 
-async function postFiles(data){
+async function postFiles(data, res){
     // Analyze a yalex
     let yalexAnalyzer = new YalexAnalyzer(data["body"]["yalex"]);
     // Make a yapar file to tokenize it then
@@ -25,7 +27,30 @@ async function postFiles(data){
         throw Error(`Some token is not defined`);
     };
     let yapar = new YaPar(tokens, ignoreTokens, productions);
-    
+    console.log(drawGraphItems(yapar.items, yapar.transitions))
+    graphviz.dot(drawGraphItems(yapar.items, yapar.transitions), 'svg').then((svg) => {
+      // Modify the SVG content (change width and height)
+      const modifiedSVG = svg.replace(
+          /<svg width="([\d.]+)pt" height="([\d.]+)pt"/,
+          '<svg width="100%" height="100%"' // Replace with your desired width and height
+      );
+
+      // Write the modified SVG content to a file
+      fs.writeFileSync('./images/itemsAutomathon.svg', modifiedSVG);
+
+      // Read the modified SVG file
+      fs.readFile('./images/itemsAutomathon.svg', 'utf8', (err, data) => {
+          if (err) {
+              console.error(err);
+              res.status(500).send('Internal Server Error');
+              return;
+          }
+          // Set the content type to SVG
+          res.set('Content-Type', 'image/svg+xml');
+          // Send the modified SVG file in the response
+          res.send(data);
+      });
+  });
     
 };
 
