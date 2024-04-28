@@ -6,6 +6,7 @@ class YaPar{
         this.ignoreTokens = ignoreTokens;
         this.productions = productions;
         this.items = [];
+        this.transitions = new Map();
         this.addInitialState();
         this.constructCanonical();
     }
@@ -23,6 +24,19 @@ class YaPar{
             });
         });
     }
+    findIndexInArrayOfArrayOfItems(C, setItems) {
+        for (let i = 0; i < C.length; i++) {
+            if (C[i].every(item => {
+                return setItems.some(item1 => {
+                    return JSON.stringify(item1) === JSON.stringify(item);
+                });
+            })) {
+                return i; // Return the index if setItems are found
+            }
+        }
+        return -1; // Return -1 if setItems are not found in any array
+    }
+    
     constructCanonical(){
         let C = [this.closure(this.items[0])];
         let grammarSymbols = ["E\'", ...Array.from(this.productions.keys()), ...this.tokens.filter((token)=>!this.ignoreTokens.includes(token))];
@@ -32,14 +46,27 @@ class YaPar{
             lengthC = C.length
             for (let k = 0; k < C.length; k++){
                 let setItem = C[k];
+                // Create the transitions for the setItem (State)
+                this.transitions.set(k, new Map());
                 // console.log(setItem);
                 for (let j = 0; j < grammarSymbols.length; j++){
                     let symbol = grammarSymbols[j];
                     // console.log(symbol);
                     let newSetItems = this.goTo(setItem, symbol);
                     // console.log(newSetItems)
+                    // console.log("Found: "+this.setItemsInArray(C, newSetItems)+"    index:"+this.findIndexInArrayOfArrayOfItems(C, newSetItems));
                     if (newSetItems.length >0 && !this.setItemsInArray(C, newSetItems)){
                         C.push(newSetItems);
+                        // Add transition to the index
+                        this.transitions.get(k).set(symbol, C.length-1)
+                    }
+                    // The setItem exist so must add a transition to it
+                    else{
+                        // Get the index of the setItem
+                        let index = this.findIndexInArrayOfArrayOfItems(C, newSetItems);
+                        if (index!==-1){
+                            this.transitions.get(k).set(symbol, index);
+                        }
                     }
                 }
             }
@@ -50,6 +77,8 @@ class YaPar{
             for (let j = 0; j < this.items[k].length; j++){
                 console.log(this.items[k][j]);
             }
+            console.log("transitions:")
+            console.log(this.transitions.get(k));
         }
     }
     goTo(I, X){
