@@ -1,21 +1,16 @@
-%token ws
-%token id
-%token plus
-%token lparen rparen
-%token times
-IGNORE ws
+%token TOKEN_0 TOKEN_1 TOKEN_2 TOKEN_3 TOKEN_4 TOKEN_5 TOKEN_6 TOKEN_7
+%token digits number id string
+
+IGNORE TOKEN_7
 
 %%
 
-expression:
-    expression plus term
-  | term
-;
-term:
-    term times factor
-  | factor
-;
-factor:
-    lparen expression rparen
-  | id
+prod1:
+TOKEN_0 TOKEN_1 prod1 prod2 | prod3 prod4 digits | number id | string;
+prod2:
+prod2 TOKEN_4 prod3 | TOKEN_2 prod1 | TOKEN_3;
+prod3:
+prod1 TOKEN_5 | id;
+prod4:
+number | string | digits | prod4 prod2
 ;
