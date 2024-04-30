@@ -128,11 +128,12 @@ class YaPar{
             for (let k = 0; k < J.length; k++){
                 let item = J[k];
                 let nyTerminal = item.production[item.pos];
-                // In case is a not terminal
-                if (!this.tokens.includes(nyTerminal) && nyTerminal !== undefined){
+                // In case is a not terminal, not undefined and is not epsilon
+                if (!this.tokens.includes(nyTerminal) && nyTerminal !== undefined && nyTerminal != ''){
                     // console.log(nyTerminal)
                     let productions = this.productions.get(nyTerminal);
-                    // console.log(this.productions)
+                    console.log(nyTerminal)
+                    console.log(productions)
                     for (let j = 0; j < productions.length; j++){
                         // console.log("NYTErminal: "+nyTerminal+"\nproductions: "+productions[j]);
                         // console.log("YTProduction1:"+ynterminal.production.join(" ")+"Production2:"+ productions[j].join(" "))
