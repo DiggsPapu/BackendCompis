@@ -7,7 +7,7 @@ const { graphviz } = require('node-graphviz');
 
 async function postFiles(data, res){
     // Analyze a yalex
-    let yalexAnalyzer = new YalexAnalyzer(data["body"]["yalex"]);
+    // let yalexAnalyzer = new YalexAnalyzer(data["body"]["yalex"]);
     // Make a yapar file to tokenize it then
     fs.writeFile("yaparFile.yalp", data["body"]["yapar"], (err) => {
       if (err) {
@@ -18,16 +18,16 @@ async function postFiles(data, res){
     });
     // Tokenize the yapar
     let [tokens, ignoreTokens, productions] = await YaparTokenizer.tokenizeYapar("./yaparFile.yalp");
-    let keys = Array.from(yalexAnalyzer.rulesSet.keys());
+    // let keys = Array.from(yalexAnalyzer.rulesSet.keys());
     console.log(tokens)
     console.log(ignoreTokens)
     console.log(productions)
-    console.log(keys)
+    // console.log(keys)
     // Check if the yapar tokens exist in the yalex file tokens
-    console.log(tokens.filter(token => !keys.includes(token)));
-    if (tokens.filter(token => !keys.includes(token)).length>0){
-        throw Error(`Some token is not defined`);
-    };
+    // console.log(tokens.filter(token => !keys.includes(token)));
+    // if (tokens.filter(token => !keys.includes(token)).length>0){
+    //     throw Error(`Some token is not defined`);
+    // };
     let yapar = new YaPar(tokens, ignoreTokens, productions);
     console.log(drawGraphItems(yapar.items, yapar.transitions))
     graphviz.dot(drawGraphItems(yapar.items, yapar.transitions), 'svg').then((svg) => {
