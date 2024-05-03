@@ -6,6 +6,7 @@ class YaPar{
         this.ignoreTokens = ignoreTokens;
         this.productions = productions;
         this.items = [];
+        this.finalState = 0;
         this.transitions = new Map();
         this.addInitialState();
         this.constructCanonical();
@@ -58,7 +59,7 @@ class YaPar{
                     if (newSetItems.length >0 && !this.setItemsInArray(C, newSetItems)){
                         C.push(newSetItems);
                         // Add transition to the index
-                        this.transitions.get(k).set(symbol, C.length-1)
+                        this.transitions.get(k).set(symbol, C.length-1);
                     }
                     // The setItem exist so must add a transition to it
                     else{
@@ -72,14 +73,14 @@ class YaPar{
             }
         }
         this.items = C;
-        // for (let k = 0; k < this.items.length; k++){
-        //     console.log(`I${k}: `);
-        //     for (let j = 0; j < this.items[k].length; j++){
-        //         console.log(this.items[k][j]);
-        //     }
-        //     console.log("transitions:")
-        //     console.log(this.transitions.get(k));
-        // }
+        for (let k = 0; k < this.items.length; k++){
+            console.log(`I${k}: `);
+            for (let j = 0; j < this.items[k].length; j++){
+                console.log(this.items[k][j]);
+            }
+            console.log("transitions:")
+            console.log(this.transitions.get(k));
+        }
     }
     goTo(I, X){
         let newItem = [];
@@ -142,7 +143,7 @@ class YaPar{
                     // ).length>0)
                     // If the item is not already in the set
                         if (J.filter((ynterminal)=>
-                            ynterminal.pos === 0  && ynterminal.production.join(" ") === productions[j].join(" ")
+                            ynterminal.pos === 0  && ynterminal.production.join(" ") === productions[j].join(" ") && nyTerminal == ynterminal.name
                         ).length===0){
                             J.push(new Item(nyTerminal, 0, productions[j]))
                         }
