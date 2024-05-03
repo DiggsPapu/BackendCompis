@@ -1,23 +1,28 @@
 
-%token A B C D G H epsilon
+%token ID
+%token PLUS
+%token MINUS
+%token TIMES
+%token DIV
+%token NUMBER
+%token LPAREN RPAREN
+%token WHITESPACE
+IGNORE WHITESPACE
 
 %%
 
-s:
-    | a c b
-    | c B B
-    | b A
+expression:
+  | expression PLUS term
+  | expression MINUS term
+  | term
 ;
-a:
-    | D A
-    | b c
+term:
+  | term TIMES factor
+  | term DIV factor
+  | factor
 ;
-b:
-    | G
-    | epsilon
+factor:
+  | LPAREN expression RPAREN
+  | ID
+  | NUMBER
 ;
-c:
-    | H
-    | epsilon
-;
-
