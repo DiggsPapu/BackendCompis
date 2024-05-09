@@ -310,12 +310,17 @@ const drawGraphTokens = (nfa) => {
     return [string_graph, counter];
   };
   
-  function drawGraphItems(items, transitions){
+  function drawGraphItems(items, transitions, finalState){
     let string_graph = `digraph items{rankdir=LR;\nsize="20,20;\n"`;
     let transitionText = ""
     for (let k = 0; k < items.length; k++){
       // Creating the nodes
-      string_graph+=`node[shape = box, label=\"I${k}\n`;
+      if (k === finalState){
+        string_graph+=`node[shape = box, peripheries=2, label=\"I${k}\n`;
+      }
+      else{
+        string_graph+=`node[shape = box,peripheries=1, label=\"I${k}\n`;
+      }
       for (let j = 0; j < items[k].length; j++){
         let item = items[k][j];
         let stringProduction = item.production.join(" ").split(" ");

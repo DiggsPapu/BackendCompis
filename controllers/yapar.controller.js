@@ -29,8 +29,8 @@ async function postFiles(data, res){
     //     throw Error(`Some token is not defined`);
     // };
     let yapar = new YaPar(tokens, ignoreTokens, productions);
-    console.log(drawGraphItems(yapar.items, yapar.transitions))
-    graphviz.dot(drawGraphItems(yapar.items, yapar.transitions), 'svg').then((svg) => {
+    // console.log(drawGraphItems(yapar.items, yapar.transitions))
+    graphviz.dot(drawGraphItems(yapar.items, yapar.transitions, yapar.finalState), 'svg').then((svg) => {
       // Modify the SVG content (change width and height)
       const modifiedSVG = svg.replace(
           /<svg width="([\d.]+)pt" height="([\d.]+)pt"/,

@@ -1,28 +1,23 @@
 
-%token A B C D G H F
+%token A B C D G H epsilon
 
 %%
 
 s:
-    | A b d H
+    | a c b
+    | c B B
+    | b A
+;
+a:
+    | D A
+    | b c
 ;
 b:
-    | C c
-;
-c:
-    | B c
-    | epsilon
-;
-d:
-    | e f
-;
-e:
     | G
     | epsilon
 ;
-f:
-    | F
+c:
+    | H
     | epsilon
 ;
 
-epsilon: ;

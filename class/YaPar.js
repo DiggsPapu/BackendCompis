@@ -41,6 +41,7 @@ class YaPar{
     constructCanonical(){
         let C = [this.closure(this.items[0])];
         let grammarSymbols = ["E\'", ...Array.from(this.productions.keys()), ...this.tokens.filter((token)=>!this.ignoreTokens.includes(token))];
+        let finalState = new Item("E\'", 1, [Array.from(this.productions.keys())[0]]);
         console.log(grammarSymbols);
         let lengthC = 0;
         while (lengthC!==C.length){
@@ -77,10 +78,17 @@ class YaPar{
             console.log(`I${k}: `);
             for (let j = 0; j < this.items[k].length; j++){
                 console.log(this.items[k][j]);
+                // console.log(this.items[k][j].name==="E\'")
+                // console.log(this.items[k][j].pos===1)
+                // console.log(this.items[k][j].production)
+                if (this.items[k][j].name==="E'" && this.items[k][j].pos === 1 && this.items[k][j].production[0]===Array.from(this.productions.keys())[0]){
+                    this.finalState = k;
+                }
             }
             console.log("transitions:")
             console.log(this.transitions.get(k));
         }
+        console.log(this.finalState);
     }
     goTo(I, X){
         let newItem = [];
