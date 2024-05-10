@@ -4,10 +4,10 @@ const YaparTokenizer = require("../utils/YaparScanner");
 const YaPar = require('../class/YaPar');
 const { drawGraphItems } = require('./draw.functions');
 const { graphviz } = require('node-graphviz');
-
+let yapar = null;
 async function postFiles(data, res){
     // Analyze a yalex
-    // let yalexAnalyzer = new YalexAnalyzer(data["body"]["yalex"]);
+    let yalexAnalyzer = new YalexAnalyzer(data["body"]["yalex"]);
     // Make a yapar file to tokenize it then
     fs.writeFile("yaparFile.yalp", data["body"]["yapar"], (err) => {
       if (err) {
@@ -18,17 +18,17 @@ async function postFiles(data, res){
     });
     // Tokenize the yapar
     let [tokens, ignoreTokens, productions] = await YaparTokenizer.tokenizeYapar("./yaparFile.yalp");
-    // let keys = Array.from(yalexAnalyzer.rulesSet.keys());
+    let keys = Array.from(yalexAnalyzer.rulesSet.keys());
     console.log(tokens)
     console.log(ignoreTokens)
     console.log(productions)
     // console.log(keys)
     // Check if the yapar tokens exist in the yalex file tokens
-    // console.log(tokens.filter(token => !keys.includes(token)));
-    // if (tokens.filter(token => !keys.includes(token)).length>0){
-    //     throw Error(`Some token is not defined`);
-    // };
-    let yapar = new YaPar(tokens, ignoreTokens, productions);
+    console.log(tokens.filter(token => !keys.includes(token)));
+    if (tokens.filter(token => !keys.includes(token)).length>0){
+        throw Error(`Some token is not defined`);
+    };
+    yapar = new YaPar(tokens, ignoreTokens, productions);
     // console.log(drawGraphItems(yapar.items, yapar.transitions))
     graphviz.dot(drawGraphItems(yapar.items, yapar.transitions, yapar.finalState), 'svg').then((svg) => {
       // Modify the SVG content (change width and height)
@@ -52,9 +52,12 @@ async function postFiles(data, res){
           res.send(data);
       });
   });
-    
 };
+async function evaluateChain(data, res){
+  console.log(data["body"]);
 
+}
 module.exports = {
-    postFiles
+    postFiles,
+    evaluateChain
 }

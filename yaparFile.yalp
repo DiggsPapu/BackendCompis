@@ -1,23 +1,25 @@
-
-%token A B C D G H epsilon
+%token ws
+%token id
+%token plus
+%token lparen rparen
+%token times
+IGNORE ws
 
 %%
+expression0:
+term expression;
 
-s:
-    | a c b
-    | c B B
-    | b A
+expression:
+    plus term expression
+  | 
 ;
-a:
-    | D A
-    | b c
+term:
+factor term1;
+term1:
+    times factor term1
+  | 
 ;
-b:
-    | G
-    | epsilon
+factor:
+    lparen expression rparen
+  | id
 ;
-c:
-    | H
-    | epsilon
-;
-

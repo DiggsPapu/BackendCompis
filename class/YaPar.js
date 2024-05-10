@@ -2,14 +2,22 @@ const Item = require("./Item");
 
 class YaPar{
     constructor(tokens, ignoreTokens, productions){
+        // Terminals
         this.tokens = tokens;
         this.ignoreTokens = ignoreTokens;
         this.productions = productions;
         this.items = [];
         this.finalState = 0;
         this.transitions = new Map();
+        this.noTerminals = Array.from(this.productions.keys());
         this.addInitialState();
         this.constructCanonical();
+        console.log(this.first(["expression0"]));
+        console.log(this.first(["term"]));
+        console.log(this.first(["factor"]));
+        console.log(this.first(["expression"]));
+        console.log(this.first(["term1"]));
+        console.log(this.follow())
     }
     addInitialState(){
         let items = [];
@@ -41,7 +49,6 @@ class YaPar{
     constructCanonical(){
         let C = [this.closure(this.items[0])];
         let grammarSymbols = ["E\'", ...Array.from(this.productions.keys()), ...this.tokens.filter((token)=>!this.ignoreTokens.includes(token))];
-        let finalState = new Item("E\'", 1, [Array.from(this.productions.keys())[0]]);
         console.log(grammarSymbols);
         let lengthC = 0;
         while (lengthC!==C.length){
@@ -87,8 +94,8 @@ class YaPar{
             }
             console.log("transitions:")
             console.log(this.transitions.get(k));
-        }
-        console.log(this.finalState);
+        };
+        // console.log(this.finalState);
     }
     goTo(I, X){
         let newItem = [];
@@ -99,7 +106,7 @@ class YaPar{
             if (item.production[item.pos]===X){
                 // console.log(itemsList[j])
                 // console.log(itemsList[j].production)
-                // console.log(itemsList[j].production[itemsList[j].pos+1])
+                // console.log(itemsList[j].production[itemsList[j].p0os+1])
                 let newTerminal =  new Item(item.name, item.pos+1, item.production);
                 let newItem1 = [newTerminal];
                 // console.log(newItem.items);
@@ -114,8 +121,6 @@ class YaPar{
                         newItem.push(newItems[j]);
                     }
                 }
-                
-
                 // console.log("Return:")
                 // console.log(item2)
                 // newItem = [...newItem,...item2];
@@ -164,6 +169,71 @@ class YaPar{
             }
         }
         return J;
+    };
+    first(X){
+        let listF = [];
+        for (let k = 0; k < X.length; k++){
+            let symbol = X[k];
+            // It's a terminal and is in the first position: X-> aBC
+            if (k === 0 && this.tokens.includes(symbol)){
+                return [symbol];
+            }
+            // It's a terminal && haven't been pushed: X->ABCdER
+            else if (this.tokens.includes(symbol) && !listF.includes(symbol)){
+                listF.push(symbol)
+            }
+            // It's epsilon and haven't been pushed
+            else if (symbol === '' && !listF.includes('')){
+                listF.push('');
+            }
+            // It's a non terminal
+            else if (this.noTerminals.includes(symbol)){
+                // Get the productions
+                let productions = this.productions.get(symbol);
+                for (let j = 0; j < productions.length; j++){
+                    // Left Recursion, ignored
+                    if (productions[j][0]!== symbol){
+                        let returnedList = this.first(productions[j]);
+                        returnedList.map((value)=>{
+                            if (!listF.includes(value)){listF.push(value);};
+                        });
+                    };
+                };
+            };
+            return listF;
+        };
+    };
+    follow() {
+        let followSet = new Map();
+        let keys = Array.from(this.productions.keys());
+        for (let k = 0; k < keys.length; k++){
+            let key = keys[k];
+            // create a new set for the key
+            followSet.set(key, []);
+            // If it's the initial key append $
+            if (k === 0){
+                followSet.get(key).push("$");
+            };
+            let productions = this.productions.get(key);
+            for (let j = 0; j < productions.length; j++){
+                let production = productions[j];
+                // Work from the last index to the first one
+                for (let i = production.length-1; i > -1; i--){
+                    let possibleFollow = this.first([production[i]]);
+                    possibleFollow.map((value)=>{
+                        // If it is not already in the set is pushed inside
+                        if (!followSet.get(key).includes(value) && value!==''){
+                            followSet.get(key).push(value);
+                        };
+                    })
+                    // If it doesn't has epsilon
+                    if (!possibleFollow.includes('')){
+                        break;
+                    }
+                }   
+            }
+        };
+        return followSet;
     }
     
 }
