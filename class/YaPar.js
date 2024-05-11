@@ -10,6 +10,8 @@ class YaPar{
         this.finalState = 0;
         this.transitions = new Map();
         this.noTerminals = Array.from(this.productions.keys());
+        this.followSet = new Map();
+        this.firstSet = new Map();
         this.addInitialState();
         this.constructCanonical();
         console.log(this.first(["expression0"]));
@@ -17,7 +19,8 @@ class YaPar{
         console.log(this.first(["factor"]));
         console.log(this.first(["expression"]));
         console.log(this.first(["term1"]));
-        console.log(this.follow())
+        console.log(this.follow1("expression0"))
+        console.log(this.followSet);
     }
     addInitialState(){
         let items = [];
@@ -172,37 +175,100 @@ class YaPar{
     };
     first(X){
         let listF = [];
-        for (let k = 0; k < X.length; k++){
-            let symbol = X[k];
-            // It's a terminal and is in the first position: X-> aBC
-            if (k === 0 && this.tokens.includes(symbol)){
-                return [symbol];
-            }
-            // It's a terminal && haven't been pushed: X->ABCdER
-            else if (this.tokens.includes(symbol) && !listF.includes(symbol)){
-                listF.push(symbol)
-            }
-            // It's epsilon and haven't been pushed
-            else if (symbol === '' && !listF.includes('')){
-                listF.push('');
-            }
-            // It's a non terminal
-            else if (this.noTerminals.includes(symbol)){
-                // Get the productions
-                let productions = this.productions.get(symbol);
-                for (let j = 0; j < productions.length; j++){
-                    // Left Recursion, ignored
-                    if (productions[j][0]!== symbol){
-                        let returnedList = this.first(productions[j]);
-                        returnedList.map((value)=>{
-                            if (!listF.includes(value)){listF.push(value);};
-                        });
-                    };
-                };
-            };
-            return listF;
+        // Rule 1, X is a terminal the First(X)={X}
+        if (X.length === 1 && (this.tokens.includes(X[0])||X[0]==='')){
+            return [X[0]]
+        }
+        if (X.length === 1 && this.noTerminals.includes(X[0])){
+            let productions = this.productions.get(X[0]);
+            productions.forEach((production)=>{
+                // Rule 3: if X->ε, then add ε to First(X)
+                if (production.length===1 && production[0]===''){
+                    listF.push('');
+                } else{
+                    // Rule 2: if X->Y1Y2...Yn is a production then place a in First(X) if for some i, a is in First(Yi) and ε is in First(Yj) where j < i
+                    let k = 0;
+                    let previousPEpsilon = true;
+                    while(k < production.length && previousPEpsilon){
+                        let symbol = production[k];
+                        // Not recursive
+                        if (symbol!==X){
+                            let possibleFirst = this.first([symbol]);
+                            if (!possibleFirst.includes('')){
+                                previousPEpsilon = false;
+                            }
+                            possibleFirst.map((terminal)=>{
+                                if (!listF.includes(terminal)){
+                                    listF.push(terminal);
+                                }
+                            });
+                        }
+                        k++;
+                    }
+                }
+            })
         };
+        return listF;
     };
+    firstString(X){
+        let firstS = []
+        for (let k = 0; k < X.length; k++){
+            if (k === 0){
+                this.first([X[k]]).map((symbol)=>{
+                    if (!firstS.includes(symbol)){
+                        firstS.push(symbol);
+                    };
+                })
+            } else{
+                this.first([X[k]]).map((symbol)=>{
+                    if (!firstS.includes(symbol) && symbol !== ''){
+                        firstS.push(symbol);
+                    };
+                })
+            }
+        };
+        return firstS;
+    }
+    // X = nonTerminal
+    follow1(X){
+        // First one append "$"
+        if (this.noTerminals[0]===X){
+            this.followSet.set(X, []);
+            this.followSet.get(X).push("$");
+        }    
+        // Get the productions
+        let productions = this.productions.get(X);
+        productions.forEach((production)=>{
+            let k = 0;
+            while (k < production.length){
+                let value = production[k];
+                if (this.noTerminals.includes(value)){
+                    // It's new
+                    if (!Array.from(this.followSet.keys()).includes(value)){
+                        this.followSet.set(value, []);
+                        this.follow1(value);
+                    }
+                    if (k < production.length+1){
+                        let first = this.first(production.slice(k+1));
+                        first.map((val)=>{
+                            if (!this.followSet.get(value).includes(val) && val!==''){
+                                this.followSet.get(value).push(val);
+                            }
+                        });
+                    }
+                    if ((k+1<production.length && this.first(production.slice(k+1)).includes(''))||k+1>=production.length){
+                        console.log(X);
+                        this.followSet.get(X).map((el)=>{
+                            if (el!==''){
+                                this.followSet.get(value).push(el);
+                            }
+                        })
+                    }
+                }
+                k++;
+            };
+        });    
+    }
     follow() {
         let followSet = new Map();
         let keys = Array.from(this.productions.keys());
