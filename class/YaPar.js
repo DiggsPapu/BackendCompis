@@ -14,11 +14,11 @@ class YaPar{
         this.firstSet = new Map();
         this.addInitialState();
         this.constructCanonical();
-        console.log(this.first(["expression0"]));
-        console.log(this.first(["term"]));
-        console.log(this.first(["factor"]));
-        console.log(this.first(["expression"]));
-        console.log(this.first(["term1"]));
+        console.log(this.firstString(["expression0"]));
+        console.log(this.firstString(["term"]));
+        console.log(this.firstString(["factor"]));
+        console.log(this.firstString(["expression"]));
+        console.log(this.firstString(["term1"]));
         console.log(this.follow1("expression0"))
         console.log(this.followSet);
     }
@@ -229,78 +229,95 @@ class YaPar{
         };
         return firstS;
     }
-    // X = nonTerminal
-    follow1(X){
-        // First one append "$"
-        if (this.noTerminals[0]===X){
-            this.followSet.set(X, []);
-            this.followSet.get(X).push("$");
-        }    
-        // Get the productions
-        let productions = this.productions.get(X);
-        productions.forEach((production)=>{
-            let k = 0;
-            while (k < production.length){
-                let value = production[k];
-                if (this.noTerminals.includes(value)){
-                    // It's new
-                    if (!Array.from(this.followSet.keys()).includes(value)){
-                        this.followSet.set(value, []);
-                        this.follow1(value);
-                    }
-                    if (k < production.length+1){
-                        let first = this.first(production.slice(k+1));
-                        first.map((val)=>{
-                            if (!this.followSet.get(value).includes(val) && val!==''){
-                                this.followSet.get(value).push(val);
-                            }
-                        });
-                    }
-                    if ((k+1<production.length && this.first(production.slice(k+1)).includes(''))||k+1>=production.length){
-                        console.log(X);
-                        this.followSet.get(X).map((el)=>{
-                            if (el!==''){
-                                this.followSet.get(value).push(el);
-                            }
-                        })
+    follow2(X){
+        // It is a non terminal
+        if (this.noTerminals.includes(X)){
+            // Rule 1: place $
+            if (this.noTerminals[0] === X){
+                if (!Array.from(this.followSet.keys()).includes(X)){
+                    this.followSet.set(X, ["$"]);
+                }
+                else{
+                    if (!this.followSet.get(X).includes("$")){
+                        this.followSet.get(X).push("$")
                     }
                 }
-                k++;
-            };
-        });    
-    }
-    follow() {
-        let followSet = new Map();
-        let keys = Array.from(this.productions.keys());
-        for (let k = 0; k < keys.length; k++){
-            let key = keys[k];
-            // create a new set for the key
-            followSet.set(key, []);
-            // If it's the initial key append $
-            if (k === 0){
-                followSet.get(key).push("$");
-            };
-            let productions = this.productions.get(key);
-            for (let j = 0; j < productions.length; j++){
-                let production = productions[j];
-                // Work from the last index to the first one
-                for (let i = production.length-1; i > -1; i--){
-                    let possibleFollow = this.first([production[i]]);
-                    possibleFollow.map((value)=>{
-                        // If it is not already in the set is pushed inside
-                        if (!followSet.get(key).includes(value) && value!==''){
-                            followSet.get(key).push(value);
-                        };
-                    })
-                    // If it doesn't has epsilon
-                    if (!possibleFollow.includes('')){
-                        break;
-                    }
-                }   
             }
-        };
-        return followSet;
+            // Rule 2: everything in first is in follow(B) except epsilon
+            for (let k = 0; k < this.noTerminals.length; k++){
+                let anNo = this.noTerminals[k];
+                let productions = this.productions.get(anNo);
+                for (let i = 0; i < productions.length; i++){
+                    let production = productions[i];
+                    for (let j = 0; j < production.length; j++){
+                        let symbol = production[j];
+                        // Check the next symbol
+                        if (this.noTerminals.includes(symbol)){
+                            if (Array.from(this.followSet.keys()).includes(symbol) && j < production.length-1){
+                                let possibleFollow = this.firstString(production[j+1]);
+                                possibleFollow.map((value)=>{
+                                    if (value !== ''){
+                                        this.followSet.get(symbol).push(value);
+                                    }
+                                })
+                            }
+                            else if (!Array.from(this.followSet.keys()).includes(symbol) && j < production.length-1){
+                                let possibleFollow = this.firstString(production[j+1]);
+                                this.followSet.set(symbol, []);
+                                possibleFollow.map((value)=>{
+                                    if (value !== ''){
+                                        this.followSet.get(symbol).push(value);
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
-    
+    // X = nonTerminal
+    follow1(X){
+        // It is a no terminal
+        if (this.noTerminals.includes(X)){
+            // Rule 1: place $ in Follow(S) where S is the start symbol of the grammar
+            if (this.noTerminals[0]===X){
+                this.followSet.set(X, ["$"]);
+            }
+            // Iterate over all the productions
+            for (let k = 0; k < this.noTerminals.length; k++){
+                let analyzedNon = this.noTerminals[k];
+                for (let j = 0; j < this.productions.get(analyzedNon).length; j++){
+                    let analyzedP = this.productions.get(analyzedNon)[j];
+                    for (let i = 0; i < analyzedP.length; i++){
+                        let symbol = analyzedP[i];
+                        if (this.noTerminals.includes(symbol)){
+                            if (!Array.from(this.followSet.keys()).includes(symbol)){
+                                this.followSet.set(symbol, []);
+                            }
+                            if (i<analyzedP.length-1){
+                                // Get the next symbol and get the first
+                                let possibleFollow = this.firstString([analyzedP[i+1]]);
+                                possibleFollow.map((production)=>{
+                                    if (!this.followSet.get(symbol).includes(production) && production !== ''){
+                                        this.followSet.get(symbol).push(production);
+                                    };
+                                    if (this.tokens.includes(analyzedP[i+1])){
+                                        i++;
+                                    };
+                                })
+                            }
+                            if (i>analyzedP.length-1){
+                                // Get the next symbol and get the first
+                                this.followSet.get(analyzedNon).map((production)=>{
+                                    this.followSet.get(symbol).push(production);
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }    
 }
 module.exports = YaPar;
