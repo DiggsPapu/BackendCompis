@@ -386,6 +386,9 @@ const drawTreeTokensAscii = (tree) =>{
           dotStr+=`<td>${nonTerminal}=`
           for (let k = 0; k < parsingTable[i][j].length; k++){
             dotStr+=`${parsingTable[i][j][k]} `;
+            if (parsingTable[i][j][k] === ''){
+              dotStr+='ε';
+            }
           }
           dotStr+=`</td>`;
         }
@@ -393,6 +396,7 @@ const drawTreeTokensAscii = (tree) =>{
       dotStr+=`</tr>`
     }
     dotStr+='</table>>];}';
+    // console.log(dotStr);
     return dotStr;
   }
   module.exports = {
