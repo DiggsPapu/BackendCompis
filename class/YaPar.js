@@ -320,6 +320,9 @@ class YaPar{
                                         rule3.push([analyzedNon, symbol2]);
                                         break;
                                     }
+                                    else if (this.noTerminals.includes(symbol2)){
+                                        rule3.push([analyzedNon, symbol2]);
+                                    }
                                     else if (this.tokens.includes(symbol2)){
                                         break;
                                     };
