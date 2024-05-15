@@ -14,18 +14,9 @@ class YaPar{
         this.firstSet = new Map();
         this.addInitialState();
         this.constructCanonical();
-        console.log(this.firstString(["expression0"]));
-        console.log(this.firstString(["term"]));
-        console.log(this.firstString(["factor"]));
-        console.log(this.firstString(["expression"]));
-        console.log(this.firstString(["term1"]));
-        console.log(this.follow("expression0"));
-        // console.log(this.follow1("expression"));
-        // console.log(this.follow1("term"));
-        // console.log(this.follow1("term1"));
-        // console.log(this.follow1("factor"));
-        console.log(this.followSet);
-        this.constructParsingTable();
+        this.follow("expression0");
+        this.parsingTable = this.constructParsingTable();
+        
     }
     addInitialState(){
         let items = [];
@@ -333,6 +324,7 @@ class YaPar{
                 };   
             }
         }
+        return parsingTable;
         // let string = `   `;
         // this.tokens.map((terminal)=>{string+=terminal+'   '})
         // string+='$'

@@ -369,6 +369,32 @@ const drawTreeTokensAscii = (tree) =>{
     };
     return [string_graph, counter];
   };
+  function createParsingTable(terminals, noTerminals, parsingTable){
+    let dotStr = `digraph G {graph [rankdir=LR];table [shape=plaintext, label=<<table border="1" cellborder="1" cellspacing="0"><tr><td>terminals/NonTerminals</td>`;
+    terminals.map((terminal)=>{
+      dotStr+=`<td>${terminal}</td>`
+    });
+    dotStr+=`<td>$</td></tr>`
+    for (let i = 0; i < parsingTable.length; i++){
+      let nonTerminal = noTerminals[i];
+      dotStr+=`<tr><td>${nonTerminal}</td>`
+      for (let j = 0; j < parsingTable[i].length; j++){
+        if (parsingTable[i][j]===null||parsingTable[i][j]===undefined){
+          dotStr+=`<td>NULL</td>`;
+        }
+        else{
+          dotStr+=`<td>${nonTerminal}=`
+          for (let k = 0; k < parsingTable[i][j].length; k++){
+            dotStr+=`${parsingTable[i][j][k]} `;
+          }
+          dotStr+=`</td>`;
+        }
+      }
+      dotStr+=`</tr>`
+    }
+    dotStr+='</table>>];}';
+    return dotStr;
+  }
   module.exports = {
     drawGraph,
     drawGraphDFA,
@@ -377,4 +403,5 @@ const drawTreeTokensAscii = (tree) =>{
     drawTreeNodeTokensAscii,
     drawTreeTokens,
     drawGraphItems,
+    createParsingTable
   }
