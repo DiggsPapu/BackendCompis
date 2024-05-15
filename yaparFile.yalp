@@ -20,6 +20,6 @@ term1:
   | 
 ;
 factor:
-    lparen expression rparen
+    lparen expression0 rparen
   | id
 ;

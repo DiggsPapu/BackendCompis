@@ -19,7 +19,11 @@ class YaPar{
         console.log(this.firstString(["factor"]));
         console.log(this.firstString(["expression"]));
         console.log(this.firstString(["term1"]));
-        console.log(this.follow1("expression0"))
+        console.log(this.follow1("expression0"));
+        // console.log(this.follow1("expression"));
+        // console.log(this.follow1("term"));
+        // console.log(this.follow1("term1"));
+        // console.log(this.follow1("factor"));
         console.log(this.followSet);
     }
     addInitialState(){
@@ -229,60 +233,63 @@ class YaPar{
         };
         return firstS;
     }
-    follow2(X){
-        // It is a non terminal
-        if (this.noTerminals.includes(X)){
-            // Rule 1: place $
-            if (this.noTerminals[0] === X){
-                if (!Array.from(this.followSet.keys()).includes(X)){
-                    this.followSet.set(X, ["$"]);
-                }
-                else{
-                    if (!this.followSet.get(X).includes("$")){
-                        this.followSet.get(X).push("$")
+    follow(X){
+        // Calculate all follow of X
+        // Rule 1: place $ in Follow(S) where S is the start symbol of the grammar
+        if (!Array.from(this.followSet.keys()).includes(X)){
+            this.followSet.set(X, []);
+        }
+        if (this.noTerminals[0]===X){
+            this.followSet.get(X).push("$");
+        }
+        // Iterate over all productions
+        for (let k = 0; k < this.noTerminals.length; k++){
+            let analyzedNon = this.noTerminals[k];
+            for (let j = 0; j < this.productions.get(analyzedNon).length; j++){
+                let analyzedP = this.productions.get(analyzedNon)[j];
+                for (let i = 0; i < analyzedP.length; i++){
+                    let symbol = analyzedP[i];
+                    // Rule 2: if there is a production A->aBV, then everything in First(V) except ε is in Follow(B)
+                    if (i<analyzedP.length-1){
+                        // Get the next symbol and get the first
+                        let possibleFollow = this.firstString([analyzedP[i+1]]);
+                        possibleFollow.map((production)=>{
+                            if (!this.followSet.get(symbol).includes(production) && production !== ''){
+                                this.followSet.get(symbol).push(production);
+                            };
+                            if (this.tokens.includes(analyzedP[i+1])){
+                                i++;
+                            };
+                        })
                     }
-                }
-            }
-            // Rule 2: everything in first is in follow(B) except epsilon
-            for (let k = 0; k < this.noTerminals.length; k++){
-                let anNo = this.noTerminals[k];
-                let productions = this.productions.get(anNo);
-                for (let i = 0; i < productions.length; i++){
-                    let production = productions[i];
-                    for (let j = 0; j < production.length; j++){
-                        let symbol = production[j];
-                        // Check the next symbol
-                        if (this.noTerminals.includes(symbol)){
-                            if (Array.from(this.followSet.keys()).includes(symbol) && j < production.length-1){
-                                let possibleFollow = this.firstString(production[j+1]);
-                                possibleFollow.map((value)=>{
-                                    if (value !== ''){
-                                        this.followSet.get(symbol).push(value);
-                                    }
-                                })
-                            }
-                            else if (!Array.from(this.followSet.keys()).includes(symbol) && j < production.length-1){
-                                let possibleFollow = this.firstString(production[j+1]);
-                                this.followSet.set(symbol, []);
-                                possibleFollow.map((value)=>{
-                                    if (value !== ''){
-                                        this.followSet.get(symbol).push(value);
-                                    }
-                                })
-                            }
+                    if (i>analyzedP.length-1){
+                        if (this.firstString(analyzedP[i]).includes('')){
+
                         }
+                        // Get the next symbol and get the first
+                        this.followSet.get(analyzedNon).map((production)=>{
+                            this.followSet.get(symbol).push(production);
+                        })
                     }
                 }
             }
         }
+        return this.followSet.get(X);
     }
     // X = nonTerminal
     follow1(X){
+        let rule3 = [];
+        for (let k = 0; k < this.noTerminals.length; k++){
+            let analyzedNon = this.noTerminals[k];
+            if (!Array.from(this.followSet.keys()).includes(analyzedNon)){
+                this.followSet.set(analyzedNon, []);
+            }
+        }
         // It is a no terminal
         if (this.noTerminals.includes(X)){
             // Rule 1: place $ in Follow(S) where S is the start symbol of the grammar
             if (this.noTerminals[0]===X){
-                this.followSet.set(X, ["$"]);
+                this.followSet.get(X).push("$");
             }
             // Iterate over all the productions
             for (let k = 0; k < this.noTerminals.length; k++){
@@ -292,9 +299,6 @@ class YaPar{
                     for (let i = 0; i < analyzedP.length; i++){
                         let symbol = analyzedP[i];
                         if (this.noTerminals.includes(symbol)){
-                            if (!Array.from(this.followSet.keys()).includes(symbol)){
-                                this.followSet.set(symbol, []);
-                            }
                             if (i<analyzedP.length-1){
                                 // Get the next symbol and get the first
                                 let possibleFollow = this.firstString([analyzedP[i+1]]);
@@ -307,16 +311,36 @@ class YaPar{
                                     };
                                 })
                             }
-                            if (i>analyzedP.length-1){
-                                // Get the next symbol and get the first
-                                this.followSet.get(analyzedNon).map((production)=>{
-                                    this.followSet.get(symbol).push(production);
-                                })
+                            if (i===analyzedP.length-1){
+                                let m = i;
+                                while(-1<m){
+                                    let symbol2 = analyzedP[m];
+                                    let something = this.firstString([symbol2]);
+                                    if (this.noTerminals.includes(symbol2) && !something.includes('')){
+                                        rule3.push([analyzedNon, symbol2]);
+                                        break;
+                                    }
+                                    else if (this.tokens.includes(symbol2)){
+                                        break;
+                                    };
+                                    m--;
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+        // rule 3: update if they have the same
+        console.log(rule3)
+        for (let j = 0; j < rule3.length; j++){
+            let pairs = rule3[j];
+            this.followSet.get(pairs[0]).map((symbol)=>{
+                console.log(symbol);
+                if (!this.followSet.get(pairs[1]).includes(symbol)){
+                    this.followSet.get(pairs[1]).push(symbol);
+                }
+            })
         }
     }    
 }
