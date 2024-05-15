@@ -3,7 +3,7 @@ const Item = require("./Item");
 class YaPar{
     constructor(tokens, ignoreTokens, productions){
         // Terminals
-        this.tokens = tokens;
+        this.tokens = tokens.filter((token)=>!ignoreTokens.includes(token));
         this.ignoreTokens = ignoreTokens;
         this.productions = productions;
         this.items = [];
@@ -19,12 +19,13 @@ class YaPar{
         console.log(this.firstString(["factor"]));
         console.log(this.firstString(["expression"]));
         console.log(this.firstString(["term1"]));
-        console.log(this.follow1("expression0"));
+        console.log(this.follow("expression0"));
         // console.log(this.follow1("expression"));
         // console.log(this.follow1("term"));
         // console.log(this.follow1("term1"));
         // console.log(this.follow1("factor"));
         console.log(this.followSet);
+        this.constructParsingTable();
     }
     addInitialState(){
         let items = [];
@@ -217,67 +218,22 @@ class YaPar{
     firstString(X){
         let firstS = []
         for (let k = 0; k < X.length; k++){
-            if (k === 0){
-                this.first([X[k]]).map((symbol)=>{
-                    if (!firstS.includes(symbol)){
-                        firstS.push(symbol);
-                    };
-                })
-            } else{
-                this.first([X[k]]).map((symbol)=>{
-                    if (!firstS.includes(symbol) && symbol !== ''){
-                        firstS.push(symbol);
-                    };
-                })
+            let possibleF = this.first([X[k]]);
+            possibleF.map((symbol)=>{
+                if (!firstS.includes(symbol) && symbol!==''){
+                    firstS.push(symbol);
+                };
+            })
+            if (k === X.length-1 && possibleF.includes('')){
+                firstS.push('')  
+            } else if (!possibleF.includes('')){
+                break;
             }
         };
         return firstS;
     }
-    follow(X){
-        // Calculate all follow of X
-        // Rule 1: place $ in Follow(S) where S is the start symbol of the grammar
-        if (!Array.from(this.followSet.keys()).includes(X)){
-            this.followSet.set(X, []);
-        }
-        if (this.noTerminals[0]===X){
-            this.followSet.get(X).push("$");
-        }
-        // Iterate over all productions
-        for (let k = 0; k < this.noTerminals.length; k++){
-            let analyzedNon = this.noTerminals[k];
-            for (let j = 0; j < this.productions.get(analyzedNon).length; j++){
-                let analyzedP = this.productions.get(analyzedNon)[j];
-                for (let i = 0; i < analyzedP.length; i++){
-                    let symbol = analyzedP[i];
-                    // Rule 2: if there is a production A->aBV, then everything in First(V) except ε is in Follow(B)
-                    if (i<analyzedP.length-1){
-                        // Get the next symbol and get the first
-                        let possibleFollow = this.firstString([analyzedP[i+1]]);
-                        possibleFollow.map((production)=>{
-                            if (!this.followSet.get(symbol).includes(production) && production !== ''){
-                                this.followSet.get(symbol).push(production);
-                            };
-                            if (this.tokens.includes(analyzedP[i+1])){
-                                i++;
-                            };
-                        })
-                    }
-                    if (i>analyzedP.length-1){
-                        if (this.firstString(analyzedP[i]).includes('')){
-
-                        }
-                        // Get the next symbol and get the first
-                        this.followSet.get(analyzedNon).map((production)=>{
-                            this.followSet.get(symbol).push(production);
-                        })
-                    }
-                }
-            }
-        }
-        return this.followSet.get(X);
-    }
     // X = nonTerminal
-    follow1(X){
+    follow(X){
         let rule3 = [];
         for (let k = 0; k < this.noTerminals.length; k++){
             let analyzedNon = this.noTerminals[k];
@@ -311,18 +267,22 @@ class YaPar{
                                     };
                                 })
                             }
+                            // to get the tuples to execute rule 3
                             if (i===analyzedP.length-1){
                                 let m = i;
                                 while(-1<m){
                                     let symbol2 = analyzedP[m];
                                     let something = this.firstString([symbol2]);
+                                    // this means it will end because it gets the follow for that one
                                     if (this.noTerminals.includes(symbol2) && !something.includes('')){
                                         rule3.push([analyzedNon, symbol2]);
                                         break;
                                     }
+                                    // if it is follow because it is epsilon it will actually count to follow
                                     else if (this.noTerminals.includes(symbol2)){
                                         rule3.push([analyzedNon, symbol2]);
                                     }
+                                    // if it is a nonterminal it stops
                                     else if (this.tokens.includes(symbol2)){
                                         break;
                                     };
@@ -335,16 +295,63 @@ class YaPar{
             }
         }
         // rule 3: update if they have the same
-        console.log(rule3)
         for (let j = 0; j < rule3.length; j++){
             let pairs = rule3[j];
             this.followSet.get(pairs[0]).map((symbol)=>{
-                console.log(symbol);
                 if (!this.followSet.get(pairs[1]).includes(symbol)){
                     this.followSet.get(pairs[1]).push(symbol);
                 }
             })
         }
+    }
+    constructParsingTable(){
+        let parsingTable = Array.from({ length: this.noTerminals.length }, () => Array.from({ length: this.tokens.length+1 }, () => null));
+        for (let k = 0; k < this.noTerminals.length; k++){
+            let analyzedNon = this.noTerminals[k];
+            for (let j = 0; j < this.productions.get(analyzedNon).length; j++){
+                let production = this.productions.get(analyzedNon)[j];
+                let terminals = this.firstString(production);
+                for (let l = 0; l < terminals.length; l++){
+                    let terminal = terminals[l];
+                    // If it is a terminal or is epsilon
+                    // Rule 1: for each terminal a in first(alpha), add A->alpha to M[A,a]
+                    if (this.tokens.includes(terminal)){
+                        parsingTable[k][this.tokens.indexOf(terminal)] = production;
+                    }
+                }
+                // Rule 2: if ε is in first(alpha, then for each terminal b) 
+                if (terminals.includes('')){
+                    this.followSet.get(analyzedNon).map((terminal)=>{
+                        if (this.tokens.includes(terminal)){
+                            parsingTable[k][this.tokens.indexOf(terminal)] = production;
+                        } 
+                        // Will be the last 
+                        else if (terminal==='$'){
+                            parsingTable[k][this.tokens.length] = production;
+                        };
+                    });
+                };   
+            }
+        }
+        // let string = `   `;
+        // this.tokens.map((terminal)=>{string+=terminal+'   '})
+        // string+='$'
+        // for (let k = 0; k < this.noTerminals.length; k++){
+        //     let analyzedNon = this.noTerminals[k];
+        //     string+='\n'+analyzedNon;
+        //     for (let j = 0; j < this.tokens.length+1; j++){
+        //         string+='   '+analyzedNon+'->';
+        //         if (parsingTable[k][j]!==null){
+        //             for (let i = 0; i < parsingTable[k][j].length; i++){
+        //                 string+=' '+parsingTable[k][j][i];
+        //             }
+        //         }
+        //         else{
+        //             string+='    ' 
+        //         }
+        //     }
+        // }
+        // console.log(string);
     }    
 }
 module.exports = YaPar;
