@@ -5,98 +5,70 @@
  -->
 <!-- Title: G Pages: 1 -->
 <svg width="100%" height="100%"
- viewBox="0.00 0.00 1050.00 150.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 146)">
+ viewBox="0.00 0.00 874.00 106.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 102)">
 <title>G</title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-146 1046,-146 1046,4 -4,4"/>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-102 870,-102 870,4 -4,4"/>
 <!-- table -->
 <g id="node1" class="node">
 <title>table</title>
-<polygon fill="none" stroke="black" points="9,-115 9,-137 151,-137 151,-115 9,-115"/>
-<text text-anchor="start" x="11.57" y="-121.4" font-family="Times,serif" font-size="14.00">terminals/NonTerminals</text>
-<polygon fill="none" stroke="black" points="151,-115 151,-137 324,-137 324,-115 151,-115"/>
-<text text-anchor="start" x="232.05" y="-121.4" font-family="Times,serif" font-size="14.00">id</text>
-<polygon fill="none" stroke="black" points="324,-115 324,-137 517,-137 517,-115 324,-115"/>
-<text text-anchor="start" x="408.83" y="-121.4" font-family="Times,serif" font-size="14.00">plus</text>
-<polygon fill="none" stroke="black" points="517,-115 517,-137 711,-137 711,-115 517,-115"/>
-<text text-anchor="start" x="596.51" y="-121.4" font-family="Times,serif" font-size="14.00">lparen</text>
-<polygon fill="none" stroke="black" points="711,-115 711,-137 796,-137 796,-115 711,-115"/>
-<text text-anchor="start" x="735.62" y="-121.4" font-family="Times,serif" font-size="14.00">rparen</text>
-<polygon fill="none" stroke="black" points="796,-115 796,-137 948,-137 948,-115 796,-115"/>
-<text text-anchor="start" x="856.83" y="-121.4" font-family="Times,serif" font-size="14.00">times</text>
-<polygon fill="none" stroke="black" points="948,-115 948,-137 1033,-137 1033,-115 948,-115"/>
-<text text-anchor="start" x="987" y="-121.4" font-family="Times,serif" font-size="14.00">$</text>
-<polygon fill="none" stroke="black" points="9,-93 9,-115 151,-115 151,-93 9,-93"/>
-<text text-anchor="start" x="46.57" y="-99.4" font-family="Times,serif" font-size="14.00">expression0</text>
-<polygon fill="none" stroke="black" points="151,-93 151,-115 324,-115 324,-93 151,-93"/>
-<text text-anchor="start" x="153.85" y="-99.4" font-family="Times,serif" font-size="14.00">expression0=term expression </text>
-<polygon fill="none" stroke="black" points="324,-93 324,-115 517,-115 517,-93 324,-93"/>
-<text text-anchor="start" x="401.84" y="-99.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="517,-93 517,-115 711,-115 711,-93 517,-93"/>
-<text text-anchor="start" x="530.35" y="-99.4" font-family="Times,serif" font-size="14.00">expression0=term expression </text>
-<polygon fill="none" stroke="black" points="711,-93 711,-115 796,-115 796,-93 711,-93"/>
-<text text-anchor="start" x="734.84" y="-99.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="796,-93 796,-115 948,-115 948,-93 796,-93"/>
-<text text-anchor="start" x="853.34" y="-99.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="948,-93 948,-115 1033,-115 1033,-93 948,-93"/>
-<text text-anchor="start" x="971.84" y="-99.4" font-family="Times,serif" font-size="14.00">NULL</text>
 <polygon fill="none" stroke="black" points="9,-71 9,-93 151,-93 151,-71 9,-71"/>
-<text text-anchor="start" x="50.07" y="-77.4" font-family="Times,serif" font-size="14.00">expression</text>
-<polygon fill="none" stroke="black" points="151,-71 151,-93 324,-93 324,-71 151,-71"/>
-<text text-anchor="start" x="218.84" y="-77.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="324,-71 324,-93 517,-93 517,-71 324,-71"/>
-<text text-anchor="start" x="326.94" y="-77.4" font-family="Times,serif" font-size="14.00">expression=plus term expression </text>
-<polygon fill="none" stroke="black" points="517,-71 517,-93 711,-93 711,-71 517,-71"/>
-<text text-anchor="start" x="595.34" y="-77.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="711,-71 711,-93 796,-93 796,-71 711,-71"/>
-<text text-anchor="start" x="713.79" y="-77.4" font-family="Times,serif" font-size="14.00">expression= ε</text>
-<polygon fill="none" stroke="black" points="796,-71 796,-93 948,-93 948,-71 796,-71"/>
-<text text-anchor="start" x="853.34" y="-77.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="948,-71 948,-93 1033,-93 1033,-71 948,-71"/>
-<text text-anchor="start" x="950.79" y="-77.4" font-family="Times,serif" font-size="14.00">expression= ε</text>
+<text text-anchor="start" x="11.57" y="-77.4" font-family="Times,serif" font-size="14.00">terminals/NonTerminals</text>
+<polygon fill="none" stroke="black" points="151,-71 151,-93 253,-93 253,-71 151,-71"/>
+<text text-anchor="start" x="196.55" y="-77.4" font-family="Times,serif" font-size="14.00">id</text>
+<polygon fill="none" stroke="black" points="253,-71 253,-93 446,-93 446,-71 253,-71"/>
+<text text-anchor="start" x="337.83" y="-77.4" font-family="Times,serif" font-size="14.00">plus</text>
+<polygon fill="none" stroke="black" points="446,-71 446,-93 633,-93 633,-71 446,-71"/>
+<text text-anchor="start" x="522.01" y="-77.4" font-family="Times,serif" font-size="14.00">lparen</text>
+<polygon fill="none" stroke="black" points="633,-71 633,-93 676,-93 676,-71 633,-71"/>
+<text text-anchor="start" x="636.62" y="-77.4" font-family="Times,serif" font-size="14.00">rparen</text>
+<polygon fill="none" stroke="black" points="676,-71 676,-93 814,-93 814,-71 676,-71"/>
+<text text-anchor="start" x="729.83" y="-77.4" font-family="Times,serif" font-size="14.00">times</text>
+<polygon fill="none" stroke="black" points="814,-71 814,-93 857,-93 857,-71 814,-71"/>
+<text text-anchor="start" x="832" y="-77.4" font-family="Times,serif" font-size="14.00">$</text>
 <polygon fill="none" stroke="black" points="9,-49 9,-71 151,-71 151,-49 9,-49"/>
-<text text-anchor="start" x="67.17" y="-55.4" font-family="Times,serif" font-size="14.00">term</text>
-<polygon fill="none" stroke="black" points="151,-49 151,-71 324,-71 324,-49 151,-49"/>
-<text text-anchor="start" x="184.58" y="-55.4" font-family="Times,serif" font-size="14.00">term=factor term1 </text>
-<polygon fill="none" stroke="black" points="324,-49 324,-71 517,-71 517,-49 324,-49"/>
-<text text-anchor="start" x="401.84" y="-55.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="517,-49 517,-71 711,-71 711,-49 517,-49"/>
-<text text-anchor="start" x="561.08" y="-55.4" font-family="Times,serif" font-size="14.00">term=factor term1 </text>
-<polygon fill="none" stroke="black" points="711,-49 711,-71 796,-71 796,-49 711,-49"/>
-<text text-anchor="start" x="734.84" y="-55.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="796,-49 796,-71 948,-71 948,-49 796,-49"/>
-<text text-anchor="start" x="853.34" y="-55.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="948,-49 948,-71 1033,-71 1033,-49 948,-49"/>
-<text text-anchor="start" x="971.84" y="-55.4" font-family="Times,serif" font-size="14.00">NULL</text>
+<text text-anchor="start" x="50.07" y="-55.4" font-family="Times,serif" font-size="14.00">expression</text>
+<polygon fill="none" stroke="black" points="151,-49 151,-71 253,-71 253,-49 151,-49"/>
+<text text-anchor="start" x="153.54" y="-55.4" font-family="Times,serif" font-size="14.00">expression=term </text>
+<polygon fill="none" stroke="black" points="253,-49 253,-71 446,-71 446,-49 253,-49"/>
+<text text-anchor="start" x="255.94" y="-55.4" font-family="Times,serif" font-size="14.00">expression=expression plus term </text>
+<polygon fill="none" stroke="black" points="446,-49 446,-71 633,-71 633,-49 446,-49"/>
+<text text-anchor="start" x="491.04" y="-55.4" font-family="Times,serif" font-size="14.00">expression=term </text>
+<polygon fill="none" stroke="black" points="633,-49 633,-71 676,-71 676,-49 633,-49"/>
+<text text-anchor="start" x="635.84" y="-55.4" font-family="Times,serif" font-size="14.00">NULL</text>
+<polygon fill="none" stroke="black" points="676,-49 676,-71 814,-71 814,-49 676,-49"/>
+<text text-anchor="start" x="696.54" y="-55.4" font-family="Times,serif" font-size="14.00">expression=term </text>
+<polygon fill="none" stroke="black" points="814,-49 814,-71 857,-71 857,-49 814,-49"/>
+<text text-anchor="start" x="816.84" y="-55.4" font-family="Times,serif" font-size="14.00">NULL</text>
 <polygon fill="none" stroke="black" points="9,-27 9,-49 151,-49 151,-27 9,-27"/>
-<text text-anchor="start" x="63.67" y="-33.4" font-family="Times,serif" font-size="14.00">term1</text>
-<polygon fill="none" stroke="black" points="151,-27 151,-49 324,-49 324,-27 151,-27"/>
-<text text-anchor="start" x="218.84" y="-33.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="324,-27 324,-49 517,-49 517,-27 324,-27"/>
-<text text-anchor="start" x="394.39" y="-33.4" font-family="Times,serif" font-size="14.00">term1= ε</text>
-<polygon fill="none" stroke="black" points="517,-27 517,-49 711,-49 711,-27 517,-27"/>
-<text text-anchor="start" x="595.34" y="-33.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="711,-27 711,-49 796,-49 796,-27 711,-27"/>
-<text text-anchor="start" x="727.39" y="-33.4" font-family="Times,serif" font-size="14.00">term1= ε</text>
-<polygon fill="none" stroke="black" points="796,-27 796,-49 948,-49 948,-27 796,-27"/>
-<text text-anchor="start" x="798.66" y="-33.4" font-family="Times,serif" font-size="14.00">term1=times factor term1 </text>
-<polygon fill="none" stroke="black" points="948,-27 948,-49 1033,-49 1033,-27 948,-27"/>
-<text text-anchor="start" x="964.39" y="-33.4" font-family="Times,serif" font-size="14.00">term1= ε</text>
+<text text-anchor="start" x="67.17" y="-33.4" font-family="Times,serif" font-size="14.00">term</text>
+<polygon fill="none" stroke="black" points="151,-27 151,-49 253,-49 253,-27 151,-27"/>
+<text text-anchor="start" x="167.15" y="-33.4" font-family="Times,serif" font-size="14.00">term=factor </text>
+<polygon fill="none" stroke="black" points="253,-27 253,-49 446,-49 446,-27 253,-27"/>
+<text text-anchor="start" x="330.84" y="-33.4" font-family="Times,serif" font-size="14.00">NULL</text>
+<polygon fill="none" stroke="black" points="446,-27 446,-49 633,-49 633,-27 446,-27"/>
+<text text-anchor="start" x="504.65" y="-33.4" font-family="Times,serif" font-size="14.00">term=factor </text>
+<polygon fill="none" stroke="black" points="633,-27 633,-49 676,-49 676,-27 633,-27"/>
+<text text-anchor="start" x="635.84" y="-33.4" font-family="Times,serif" font-size="14.00">NULL</text>
+<polygon fill="none" stroke="black" points="676,-27 676,-49 814,-49 814,-27 676,-27"/>
+<text text-anchor="start" x="678.66" y="-33.4" font-family="Times,serif" font-size="14.00">term=term times factor </text>
+<polygon fill="none" stroke="black" points="814,-27 814,-49 857,-49 857,-27 814,-27"/>
+<text text-anchor="start" x="816.84" y="-33.4" font-family="Times,serif" font-size="14.00">NULL</text>
 <polygon fill="none" stroke="black" points="9,-5 9,-27 151,-27 151,-5 9,-5"/>
 <text text-anchor="start" x="63.68" y="-11.4" font-family="Times,serif" font-size="14.00">factor</text>
-<polygon fill="none" stroke="black" points="151,-5 151,-27 324,-27 324,-5 151,-5"/>
-<text text-anchor="start" x="210.04" y="-11.4" font-family="Times,serif" font-size="14.00">factor=id </text>
-<polygon fill="none" stroke="black" points="324,-5 324,-27 517,-27 517,-5 324,-5"/>
-<text text-anchor="start" x="401.84" y="-11.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="517,-5 517,-27 711,-27 711,-5 517,-5"/>
-<text text-anchor="start" x="519.68" y="-11.4" font-family="Times,serif" font-size="14.00">factor=lparen expression0 rparen </text>
-<polygon fill="none" stroke="black" points="711,-5 711,-27 796,-27 796,-5 711,-5"/>
-<text text-anchor="start" x="734.84" y="-11.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="796,-5 796,-27 948,-27 948,-5 796,-5"/>
-<text text-anchor="start" x="853.34" y="-11.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="948,-5 948,-27 1033,-27 1033,-5 948,-5"/>
-<text text-anchor="start" x="971.84" y="-11.4" font-family="Times,serif" font-size="14.00">NULL</text>
-<polygon fill="none" stroke="black" points="8,-4 8,-138 1034,-138 1034,-4 8,-4"/>
+<polygon fill="none" stroke="black" points="151,-5 151,-27 253,-27 253,-5 151,-5"/>
+<text text-anchor="start" x="174.54" y="-11.4" font-family="Times,serif" font-size="14.00">factor=id </text>
+<polygon fill="none" stroke="black" points="253,-5 253,-27 446,-27 446,-5 253,-5"/>
+<text text-anchor="start" x="330.84" y="-11.4" font-family="Times,serif" font-size="14.00">NULL</text>
+<polygon fill="none" stroke="black" points="446,-5 446,-27 633,-27 633,-5 446,-5"/>
+<text text-anchor="start" x="448.68" y="-11.4" font-family="Times,serif" font-size="14.00">factor=lparen expression rparen </text>
+<polygon fill="none" stroke="black" points="633,-5 633,-27 676,-27 676,-5 633,-5"/>
+<text text-anchor="start" x="635.84" y="-11.4" font-family="Times,serif" font-size="14.00">NULL</text>
+<polygon fill="none" stroke="black" points="676,-5 676,-27 814,-27 814,-5 676,-5"/>
+<text text-anchor="start" x="726.34" y="-11.4" font-family="Times,serif" font-size="14.00">NULL</text>
+<polygon fill="none" stroke="black" points="814,-5 814,-27 857,-27 857,-5 814,-5"/>
+<text text-anchor="start" x="816.84" y="-11.4" font-family="Times,serif" font-size="14.00">NULL</text>
+<polygon fill="none" stroke="black" points="8,-4 8,-94 858,-94 858,-4 8,-4"/>
 </g>
 </g>
 </svg>

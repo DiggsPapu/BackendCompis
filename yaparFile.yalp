@@ -6,20 +6,16 @@
 IGNORE ws
 
 %%
-expression0:
-term expression;
 
 expression:
-    plus term expression
-  | 
+    expression plus term
+  | term
 ;
 term:
-factor term1;
-term1:
-    times factor term1
-  | 
+    term times factor
+  | factor
 ;
 factor:
-    lparen expression0 rparen
+    lparen expression rparen
   | id
 ;

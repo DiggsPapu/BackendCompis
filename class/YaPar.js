@@ -14,9 +14,13 @@ class YaPar{
         this.firstSet = new Map();
         this.addInitialState();
         this.constructCanonical();
-        this.follow("expression0");
-        this.parsingTable = this.constructParsingTable();
-        
+        // console.log(this.firstString(["expression"]));
+        // console.log(this.firstString(["term"]));
+        // console.log(this.firstString(["factor"]));
+        this.follow(this.tokens[0]);
+        // console.log(this.followSet);
+        // this.parsingTableLL = this.constructParsingTableLL();
+        this.constructParsingTableSLR();
     }
     addInitialState(){
         let items = [];
@@ -187,8 +191,11 @@ class YaPar{
                     let previousPEpsilon = true;
                     while(k < production.length && previousPEpsilon){
                         let symbol = production[k];
+                        // console.log(typeof(X));
+                        // console.log(!X.includes(symbol))
                         // Not recursive
-                        if (symbol!==X){
+                        if ((typeof(X)==="string"&&symbol!==X)||(typeof(X)!=="string" && !X.includes(symbol))){
+                            
                             let possibleFirst = this.first([symbol]);
                             if (!possibleFirst.includes('')){
                                 previousPEpsilon = false;
@@ -295,7 +302,7 @@ class YaPar{
             })
         }
     }
-    constructParsingTable(){
+    constructParsingTableLL(){
         let parsingTable = Array.from({ length: this.noTerminals.length }, () => Array.from({ length: this.tokens.length+1 }, () => null));
         for (let k = 0; k < this.noTerminals.length; k++){
             let analyzedNon = this.noTerminals[k];
@@ -325,25 +332,36 @@ class YaPar{
             }
         }
         return parsingTable;
-        // let string = `   `;
-        // this.tokens.map((terminal)=>{string+=terminal+'   '})
-        // string+='$'
-        // for (let k = 0; k < this.noTerminals.length; k++){
-        //     let analyzedNon = this.noTerminals[k];
-        //     string+='\n'+analyzedNon;
-        //     for (let j = 0; j < this.tokens.length+1; j++){
-        //         string+='   '+analyzedNon+'->';
-        //         if (parsingTable[k][j]!==null){
-        //             for (let i = 0; i < parsingTable[k][j].length; i++){
-        //                 string+=' '+parsingTable[k][j][i];
-        //             }
-        //         }
-        //         else{
-        //             string+='    ' 
-        //         }
-        //     }
-        // }
-        // console.log(string);
-    }    
+    }
+    constructParsingTableSLR(){
+        // Already created the C collection of items
+        let actionTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.tokens.length+1 }, () => null));
+        let goToTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.noTerminals.length+1 }, () => null));
+        // state i constructed from Ii 
+        for (let i = 0; i < this.items.length; i++){
+            let Ii = this.items[i];
+            for (let k = 0; k < this.tokens.length; k++){
+                let terminal = this.tokens[k];
+                // a
+                let j = this.findIndexInArrayOfArrayOfItems(this.items,this.goTo(Ii, terminal));
+                let values = Ii.filter(((item)=>item.pos<=item.production.length-1 && item.production[item.pos]===terminal));
+                if (values.length>0 && j!==-1){
+                    actionTable[i][k] = `s${j}`;
+                }
+                // b
+                // if (Ii.filter((item=>item.pos===item.production.length && item.name !== this.noTerminals[0])).length>0){
+                //     let something = Ii.filter((item=>item.pos===item.production.length));
+                //     for (let k = 0; k < something.length; k++){
+                //         this.followSet.get(something[k].name).map((terminal)=>{actionTable[i][this.tokens.indexOf(terminal)]= `r${something[k].name}->${something.production.join(" ")}`});
+                //     }
+                // }
+                // c    
+                if (Ii.filter((item=>item.pos===item.production.length && item.name === "E\'")).length>0){
+                    actionTable[i][this.tokens.length] = 'accept';
+                }
+            }
+        }
+        return actionTable;
+    }
 }
 module.exports = YaPar;

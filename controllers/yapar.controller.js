@@ -2,9 +2,8 @@ const fs = require('fs');
 const YalexAnalyzer = require("../class/YalexAnalyzer");
 const YaparTokenizer = require("../utils/YaparScanner");
 const YaPar = require('../class/YaPar');
-const { drawGraphItems, createParsingTable } = require('./draw.functions');
+const { drawGraphItems, createParsingTableLL } = require('./draw.functions');
 const { graphviz } = require('node-graphviz');
-const { create } = require('domain');
 let yapar = null;
 async function postFiles(data, res){
     // Analyze a yalex
@@ -54,8 +53,8 @@ async function postFiles(data, res){
       });
   });
 };
-async function getParsingTable(data, res){
-  graphviz.dot(createParsingTable(yapar.tokens, yapar.noTerminals, yapar.parsingTable), 'svg').then((svg) => {
+async function getParsingTableLL(data, res){
+  graphviz.dot(createParsingTableLL(yapar.tokens, yapar.noTerminals, yapar.parsingTableLL), 'svg').then((svg) => {
     // Modify the SVG content (change width and height)
     const modifiedSVG = svg.replace(
         /<svg width="([\d.]+)pt" height="([\d.]+)pt"/,
@@ -84,6 +83,6 @@ async function evaluateChain(data, res){
 }
 module.exports = {
     postFiles,
-    getParsingTable,
+    getParsingTableLL,
     evaluateChain
 }

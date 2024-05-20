@@ -369,7 +369,7 @@ const drawTreeTokensAscii = (tree) =>{
     };
     return [string_graph, counter];
   };
-  function createParsingTable(terminals, noTerminals, parsingTable){
+  function createParsingTableLL(terminals, noTerminals, parsingTable){
     let dotStr = `digraph G {graph [rankdir=LR];table [shape=plaintext, label=<<table border="1" cellborder="1" cellspacing="0"><tr><td>terminals/NonTerminals</td>`;
     terminals.map((terminal)=>{
       dotStr+=`<td>${terminal}</td>`
@@ -407,5 +407,5 @@ const drawTreeTokensAscii = (tree) =>{
     drawTreeNodeTokensAscii,
     drawTreeTokens,
     drawGraphItems,
-    createParsingTable
+    createParsingTableLL
   }
