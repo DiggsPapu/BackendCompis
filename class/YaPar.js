@@ -14,12 +14,8 @@ class YaPar{
         this.firstSet = new Map();
         this.addInitialState();
         this.constructCanonical();
-        // console.log(this.firstString(["expression"]));
-        // console.log(this.firstString(["term"]));
-        // console.log(this.firstString(["factor"]));
         this.follow(this.noTerminals[0]);
         console.log(this.followSet);
-        // this.parsingTableLL = this.constructParsingTableLL();
         this.constructParsingTableSLR();
     }
     addInitialState(){
@@ -337,6 +333,7 @@ class YaPar{
         // Already created the C collection of items
         let actionTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.tokens.length+1 }, () => null));
         let goToTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.noTerminals.length+1 }, () => null));
+        let errors = ``;
         // state i constructed from Ii 
         for (let i = 0; i < this.items.length; i++){
             let Ii = this.items[i];
@@ -366,8 +363,12 @@ class YaPar{
                 // a
                 let j = this.findIndexInArrayOfArrayOfItems(this.items,this.goTo(Ii, terminal));
                 let values = Ii.filter(((item)=>item.pos<=item.production.length-1 && item.production[item.pos]===terminal));
-                if (values.length>0 && j!==-1){
+                if (values.length>0 && j!==-1 && actionTable[i][k]===null){
                     actionTable[i][k] = `s${j}`;
+                }
+                // Conflict shift-reduction
+                else if (values.length>0 && j!==-1 && actionTable[i][k]!==null){
+                    errors+=`Error: Shift-Reduction conflict in Action Table [I${i}][${terminal}] = shift ${j} or  reduce ${actionTable[i][k].name} -> ${actionTable[i][k].production.join(" ")} \n`;
                 }
             }
             // CONSTRUCT GO TO TABLE
@@ -380,6 +381,9 @@ class YaPar{
         }
         this.actionTable = actionTable;
         this.goToTable = goToTable;
+        if (errors!==``){
+            throw new Error(errors);
+        }
     }
 }
 module.exports = YaPar;
