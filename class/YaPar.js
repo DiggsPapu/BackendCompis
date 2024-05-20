@@ -17,8 +17,8 @@ class YaPar{
         // console.log(this.firstString(["expression"]));
         // console.log(this.firstString(["term"]));
         // console.log(this.firstString(["factor"]));
-        this.follow(this.tokens[0]);
-        // console.log(this.followSet);
+        this.follow(this.noTerminals[0]);
+        console.log(this.followSet);
         // this.parsingTableLL = this.constructParsingTableLL();
         this.constructParsingTableSLR();
     }
@@ -340,6 +340,27 @@ class YaPar{
         // state i constructed from Ii 
         for (let i = 0; i < this.items.length; i++){
             let Ii = this.items[i];
+            // CONSTRUCT ACTION TABLE
+            // b
+            let something = Ii.filter((item=>item.pos===item.production.length && item.name !== "E\'"));
+            if (something.length>0){
+                for (let k = 0; k < something.length; k++){
+                    this.followSet.get(something[k].name).map(
+                        (terminal)=>{
+                            if(terminal!=="$"){
+                                actionTable[i][this.tokens.indexOf(terminal)]= something[k];
+                            }
+                            else{
+                                actionTable[i][this.tokens.length]= something[k];
+                            }
+                        }
+                    );
+                }
+            }
+            // c    
+            if (Ii.filter((item=>item.pos===item.production.length && item.name === "E\'")).length>0){
+                actionTable[i][this.tokens.length] = 'accept';
+            }
             for (let k = 0; k < this.tokens.length; k++){
                 let terminal = this.tokens[k];
                 // a
@@ -348,20 +369,17 @@ class YaPar{
                 if (values.length>0 && j!==-1){
                     actionTable[i][k] = `s${j}`;
                 }
-                // b
-                // if (Ii.filter((item=>item.pos===item.production.length && item.name !== this.noTerminals[0])).length>0){
-                //     let something = Ii.filter((item=>item.pos===item.production.length));
-                //     for (let k = 0; k < something.length; k++){
-                //         this.followSet.get(something[k].name).map((terminal)=>{actionTable[i][this.tokens.indexOf(terminal)]= `r${something[k].name}->${something.production.join(" ")}`});
-                //     }
-                // }
-                // c    
-                if (Ii.filter((item=>item.pos===item.production.length && item.name === "E\'")).length>0){
-                    actionTable[i][this.tokens.length] = 'accept';
+            }
+            // CONSTRUCT GO TO TABLE
+            for (let k = 0; k < this.noTerminals.length; k++){
+                let j = this.findIndexInArrayOfArrayOfItems(this.items,this.goTo(Ii, this.noTerminals[k]));
+                if (j !== -1){
+                    goToTable[i][k] = j;
                 }
             }
         }
-        return actionTable;
+        this.actionTable = actionTable;
+        this.goToTable = goToTable;
     }
 }
 module.exports = YaPar;
