@@ -48,18 +48,22 @@ function takeTime(nfa, input){
     return [bool, startTime];
 }
 function simulateChain(req, res){
-    if (regex_ !== null){
-        res.status(200).send({
-            'NFA':takeTime(thompson_.nfa, req.body.input),
-            'NFA_DFA':takeTime(nfaToDfa_, req.body.input), 
-            'NFA_DFA_Min':takeTime(dfaMinimized_, req.body.input), 
-            'DirectDFA':takeTime(directDfa_, req.body.input), 
-            'DirectDFA_Min':takeTime(directDFAMin_, req.body.input)
-        }); 
-    }
-    else {
-        res.status(500).send({message:`Haven't initialize a regex to evaluate`})
-    }
+    try {
+        if (regex_ !== null){
+            res.status(200).send({
+                'NFA':takeTime(thompson_.nfa, req.body.input),
+                'NFA_DFA':takeTime(nfaToDfa_, req.body.input), 
+                'NFA_DFA_Min':takeTime(dfaMinimized_, req.body.input), 
+                'DirectDFA':takeTime(directDfa_, req.body.input), 
+                'DirectDFA_Min':takeTime(directDFAMin_, req.body.input)
+            }); 
+        }
+        else {
+            res.status(500).send({message:`Haven't initialize a regex to evaluate`})
+        }   
+    } catch (error) {
+        res.status(500).send({message:error});
+    }   
 }
 module.exports = {
     operateRegex,

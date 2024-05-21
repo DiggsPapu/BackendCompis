@@ -399,6 +399,39 @@ const drawTreeTokensAscii = (tree) =>{
     // console.log(dotStr);
     return dotStr;
   }
+  function createParsingTableSLR(terminals, noTerminals, actionTable, goToTable){
+    let dotStr = `digraph G {graph [rankdir=LR];table [shape=plaintext, label=<<table border="1" cellborder="1" cellspacing="0"><tr><td>Terminals/States</td>`;
+    terminals.map((terminal)=>{
+      dotStr+=`<td>${terminal}</td>`;
+    });
+    dotStr+=`<td>$</td>`;
+    noTerminals.map((nonTerminal)=>{
+      dotStr+=`<td>${nonTerminal}</td>`;
+    });
+    dotStr+=`</tr>`;
+    for (let i = 0; i < actionTable.length; i++){
+      dotStr+=`<tr><td>I${i}</td>`
+      let values = actionTable[i];
+      values.map((pos)=>{
+        if (typeof(pos)==="string"){
+          dotStr+=`<td>${pos}</td>`;
+        }
+        else if (pos === null){
+          dotStr+=`<td>NULL</td>`;
+        }
+        else{
+          dotStr+=`<td>${pos.name}: ${pos.production.join(" ")}</td>`;
+        }
+      })
+      goToTable[i].map((value)=>{
+        dotStr+=`<td>${value}</td>`
+      });      
+      dotStr+=`</tr>`
+    }
+    dotStr+='</table>>];}';
+    // console.log(dotStr);
+    return dotStr;
+  }
   module.exports = {
     drawGraph,
     drawGraphDFA,
@@ -407,5 +440,6 @@ const drawTreeTokensAscii = (tree) =>{
     drawTreeNodeTokensAscii,
     drawTreeTokens,
     drawGraphItems,
-    createParsingTableLL
+    createParsingTableLL,
+    createParsingTableSLR
   }

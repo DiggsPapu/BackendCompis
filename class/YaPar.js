@@ -15,7 +15,6 @@ class YaPar{
         this.addInitialState();
         this.constructCanonical();
         this.follow(this.noTerminals[0]);
-        console.log(this.followSet);
         this.constructParsingTableSLR();
     }
     addInitialState(){
@@ -81,9 +80,9 @@ class YaPar{
         }
         this.items = C;
         for (let k = 0; k < this.items.length; k++){
-            console.log(`I${k}: `);
+            // console.log(`I${k}: `);
             for (let j = 0; j < this.items[k].length; j++){
-                console.log(this.items[k][j]);
+                // console.log(this.items[k][j]);
                 // console.log(this.items[k][j].name==="E\'")
                 // console.log(this.items[k][j].pos===1)
                 // console.log(this.items[k][j].production)
@@ -91,8 +90,8 @@ class YaPar{
                     this.finalState = k;
                 }
             }
-            console.log("transitions:")
-            console.log(this.transitions.get(k));
+            // console.log("transitions:")
+            // console.log(this.transitions.get(k));
         };
         // console.log(this.finalState);
     }
@@ -145,8 +144,8 @@ class YaPar{
                 if (!this.tokens.includes(nyTerminal) && nyTerminal !== undefined && nyTerminal != ''){
                     // console.log(nyTerminal)
                     let productions = this.productions.get(nyTerminal);
-                    console.log(nyTerminal)
-                    console.log(productions)
+                    // console.log(nyTerminal)
+                    // console.log(productions)
                     for (let j = 0; j < productions.length; j++){
                         // console.log("NYTErminal: "+nyTerminal+"\nproductions: "+productions[j]);
                         // console.log("YTProduction1:"+ynterminal.production.join(" ")+"Production2:"+ productions[j].join(" "))
@@ -385,5 +384,16 @@ class YaPar{
             throw new Error(errors);
         }
     }
+    // parsingAlgorithm(w){
+    //     w+="$";
+    //     let a = w[0];
+    //     let stack = [];
+    //     let symbols = [];
+    //     while (true){
+    //         if (this.action[stack[stack.length-1]][this.]){
+
+    //         }
+    //     }
+    // }
 }
 module.exports = YaPar;
