@@ -156,8 +156,11 @@ async function evaluateChain(data, res){
       console.error(e);
     };
   };
-  yapar.parsingAlgorithm(tokensTok);
-  res.status(200).send({message:"hola"});
+  let response = yapar.parsingAlgorithm(tokensTok);
+  if (!response.accept){
+    res.status(400).send(response);
+  }
+  else{res.status(200).send(response);}
 }
 module.exports = {
     postFiles,

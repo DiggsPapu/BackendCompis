@@ -331,7 +331,7 @@ class YaPar{
     constructParsingTableSLR(){
         // Already created the C collection of items
         let actionTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.tokens.length+1 }, () => null));
-        let goToTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.noTerminals.length+1 }, () => null));
+        let goToTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.noTerminals.length }, () => null));
         let errors = ``;
         // state i constructed from Ii 
         for (let i = 0; i < this.items.length; i++){
@@ -385,11 +385,13 @@ class YaPar{
         }
     }
     parsingAlgorithm(w){
+        let response = `STACK               SYMBOLS             INPUT               ACTION\n`;
         w.push("$");
         let a = w[0];
         let stack = [0];
         let symbols = [];
         let pos = 0;
+        let hasErrors = false;
         while (true){
             let s = stack[stack.length-1];
             let value = null;
@@ -401,28 +403,43 @@ class YaPar{
             }            
             // It is shift
             if (typeof(value)==="string" && value!=="accept"){
+                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               ${value}\n`;
                 console.log(this.actionTable[s][this.tokens.indexOf(w[pos])])
                 stack.push(parseInt(this.actionTable[s][this.tokens.indexOf(w[pos])].slice(1)));
+                symbols.push(value);
                 pos++;
             }
             // It is an item, is reduce
-            else if (value!==null&& value!=="accept"){
+            else if (value!==null&& value!=="accept" && value!==undefined){
                 value.production.map(()=>{
                     stack.pop();
                 });
                 stack.push(this.goToTable[stack[stack.length-1]][this.noTerminals.indexOf(value.name)]);
                 console.log(`${value.name}->${value.production.join(" ")}`);
+                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               ${value.name}->${value.production.join(" ")}\n`
                 // pos++;
             }
             // Acceptance
             else if (value==="accept"){
+                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               accept\n`
                 break;
             }
             // Recovery
             else{
-
+                response += `Error with token ${w[pos]}, unexpected token in position ${pos.toString()}\n`;
+                hasErrors = true;
+                if (w.length === pos){
+                    break;
+                }
+                // continue parsing
+                pos++;
             }
         }
+        console.log(response);
+        if (hasErrors){
+            return {response:response, accept: false};
+        }
+        return {response:response, accept: true};        
     }
 }
 module.exports = YaPar;
