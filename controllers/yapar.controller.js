@@ -148,6 +148,7 @@ async function evaluateChain(data, res){
       // else show a lexical error
       else{
         tokens.push(undefined);
+        tokensTok.push(undefined);
         console.log("Lexical error, unexpected token: \'"+input.slice(k, k+10)+"\' regex");
       }
     }
@@ -155,7 +156,7 @@ async function evaluateChain(data, res){
       console.error(e);
     };
   };
-  
+  yapar.parsingAlgorithm(tokensTok);
   res.status(200).send({message:"hola"});
 }
 module.exports = {

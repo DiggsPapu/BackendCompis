@@ -385,25 +385,37 @@ class YaPar{
         }
     }
     parsingAlgorithm(w){
-        w+="$";
+        w.push("$");
         let a = w[0];
         let stack = [0];
         let symbols = [];
         let pos = 0;
         while (true){
             let s = stack[stack.length-1];
+            let value = null;
+            if (w[pos]!=="$"){
+                value = this.actionTable[s][this.tokens.indexOf(w[pos])];
+            }
+            else{
+                value = this.actionTable[s][this.tokens.length];
+            }            
             // It is shift
-            if (typeof(this.actionTable[s][this.tokens.indexOf(w[pos])])==="string" && this.actionTable[s][this.tokens.indexOf(w[pos])]!=="accept"){
-                stack.push(this.actionTable[s][w[pos]].slice(1));
+            if (typeof(value)==="string" && value!=="accept"){
+                console.log(this.actionTable[s][this.tokens.indexOf(w[pos])])
+                stack.push(parseInt(this.actionTable[s][this.tokens.indexOf(w[pos])].slice(1)));
+                pos++;
             }
             // It is an item, is reduce
-            else if (this.actionTable[s][this.tokens.indexOf(w[pos])]!==null){
-                this.actionTable[s][this.tokens.indexOf(w[pos])].productions.map(()=>{
-                    stack = stack.pop();
+            else if (value!==null&& value!=="accept"){
+                value.production.map(()=>{
+                    stack.pop();
                 });
+                stack.push(this.goToTable[stack[stack.length-1]][this.noTerminals.indexOf(value.name)]);
+                console.log(`${value.name}->${value.production.join(" ")}`);
+                // pos++;
             }
             // Acceptance
-            else if (this.actionTable[s][this.tokens.indexOf(w[pos])]==="accept"){
+            else if (value==="accept"){
                 break;
             }
             // Recovery
