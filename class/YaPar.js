@@ -2,14 +2,20 @@ const Item = require("./Item");
 
 class YaPar{
     constructor(tokens, ignoreTokens, productions){
-        this.tokens = tokens;
+        // Terminals
+        this.tokens = tokens.filter((token)=>!ignoreTokens.includes(token));
         this.ignoreTokens = ignoreTokens;
         this.productions = productions;
         this.items = [];
         this.finalState = 0;
         this.transitions = new Map();
+        this.noTerminals = Array.from(this.productions.keys());
+        this.followSet = new Map();
+        this.firstSet = new Map();
         this.addInitialState();
         this.constructCanonical();
+        this.follow(this.noTerminals[0]);
+        this.constructParsingTableSLR();
     }
     addInitialState(){
         let items = [];
@@ -74,13 +80,20 @@ class YaPar{
         }
         this.items = C;
         for (let k = 0; k < this.items.length; k++){
-            console.log(`I${k}: `);
+            // console.log(`I${k}: `);
             for (let j = 0; j < this.items[k].length; j++){
-                console.log(this.items[k][j]);
+                // console.log(this.items[k][j]);
+                // console.log(this.items[k][j].name==="E\'")
+                // console.log(this.items[k][j].pos===1)
+                // console.log(this.items[k][j].production)
+                if (this.items[k][j].name==="E'" && this.items[k][j].pos === 1 && this.items[k][j].production[0]===Array.from(this.productions.keys())[0]){
+                    this.finalState = k;
+                }
             }
-            console.log("transitions:")
-            console.log(this.transitions.get(k));
-        }
+            // console.log("transitions:")
+            // console.log(this.transitions.get(k));
+        };
+        // console.log(this.finalState);
     }
     goTo(I, X){
         let newItem = [];
@@ -91,7 +104,7 @@ class YaPar{
             if (item.production[item.pos]===X){
                 // console.log(itemsList[j])
                 // console.log(itemsList[j].production)
-                // console.log(itemsList[j].production[itemsList[j].pos+1])
+                // console.log(itemsList[j].production[itemsList[j].p0os+1])
                 let newTerminal =  new Item(item.name, item.pos+1, item.production);
                 let newItem1 = [newTerminal];
                 // console.log(newItem.items);
@@ -106,8 +119,6 @@ class YaPar{
                         newItem.push(newItems[j]);
                     }
                 }
-                
-
                 // console.log("Return:")
                 // console.log(item2)
                 // newItem = [...newItem,...item2];
@@ -133,8 +144,8 @@ class YaPar{
                 if (!this.tokens.includes(nyTerminal) && nyTerminal !== undefined && nyTerminal != ''){
                     // console.log(nyTerminal)
                     let productions = this.productions.get(nyTerminal);
-                    console.log(nyTerminal)
-                    console.log(productions)
+                    // console.log(nyTerminal)
+                    // console.log(productions)
                     for (let j = 0; j < productions.length; j++){
                         // console.log("NYTErminal: "+nyTerminal+"\nproductions: "+productions[j]);
                         // console.log("YTProduction1:"+ynterminal.production.join(" ")+"Production2:"+ productions[j].join(" "))
@@ -156,7 +167,279 @@ class YaPar{
             }
         }
         return J;
+    };
+    first(X){
+        let listF = [];
+        // Rule 1, X is a terminal the First(X)={X}
+        if (X.length === 1 && (this.tokens.includes(X[0])||X[0]==='')){
+            return [X[0]]
+        }
+        if (X.length === 1 && this.noTerminals.includes(X[0])){
+            let productions = this.productions.get(X[0]);
+            productions.forEach((production)=>{
+                // Rule 3: if X->ε, then add ε to First(X)
+                if (production.length===1 && production[0]===''){
+                    listF.push('');
+                } else{
+                    // Rule 2: if X->Y1Y2...Yn is a production then place a in First(X) if for some i, a is in First(Yi) and ε is in First(Yj) where j < i
+                    let k = 0;
+                    let previousPEpsilon = true;
+                    while(k < production.length && previousPEpsilon){
+                        let symbol = production[k];
+                        // console.log(typeof(X));
+                        // console.log(!X.includes(symbol))
+                        // Not recursive
+                        if ((typeof(X)==="string"&&symbol!==X)||(typeof(X)!=="string" && !X.includes(symbol))){
+                            
+                            let possibleFirst = this.first([symbol]);
+                            if (!possibleFirst.includes('')){
+                                previousPEpsilon = false;
+                            }
+                            possibleFirst.map((terminal)=>{
+                                if (!listF.includes(terminal)){
+                                    listF.push(terminal);
+                                }
+                            });
+                        }
+                        k++;
+                    }
+                }
+            })
+        };
+        return listF;
+    };
+    firstString(X){
+        let firstS = []
+        for (let k = 0; k < X.length; k++){
+            let possibleF = this.first([X[k]]);
+            possibleF.map((symbol)=>{
+                if (!firstS.includes(symbol) && symbol!==''){
+                    firstS.push(symbol);
+                };
+            })
+            if (k === X.length-1 && possibleF.includes('')){
+                firstS.push('')  
+            } else if (!possibleF.includes('')){
+                break;
+            }
+        };
+        return firstS;
     }
-    
+    // X = nonTerminal
+    follow(X){
+        let rule3 = [];
+        for (let k = 0; k < this.noTerminals.length; k++){
+            let analyzedNon = this.noTerminals[k];
+            if (!Array.from(this.followSet.keys()).includes(analyzedNon)){
+                this.followSet.set(analyzedNon, []);
+            }
+        }
+        // It is a no terminal
+        if (this.noTerminals.includes(X)){
+            // Rule 1: place $ in Follow(S) where S is the start symbol of the grammar
+            if (this.noTerminals[0]===X){
+                this.followSet.get(X).push("$");
+            }
+            // Iterate over all the productions
+            for (let k = 0; k < this.noTerminals.length; k++){
+                let analyzedNon = this.noTerminals[k];
+                for (let j = 0; j < this.productions.get(analyzedNon).length; j++){
+                    let analyzedP = this.productions.get(analyzedNon)[j];
+                    for (let i = 0; i < analyzedP.length; i++){
+                        let symbol = analyzedP[i];
+                        if (this.noTerminals.includes(symbol)){
+                            if (i<analyzedP.length-1){
+                                // Get the next symbol and get the first
+                                let possibleFollow = this.firstString([analyzedP[i+1]]);
+                                possibleFollow.map((production)=>{
+                                    if (!this.followSet.get(symbol).includes(production) && production !== ''){
+                                        this.followSet.get(symbol).push(production);
+                                    };
+                                    if (this.tokens.includes(analyzedP[i+1])){
+                                        i++;
+                                    };
+                                })
+                            }
+                            // to get the tuples to execute rule 3
+                            if (i===analyzedP.length-1){
+                                let m = i;
+                                while(-1<m){
+                                    let symbol2 = analyzedP[m];
+                                    let something = this.firstString([symbol2]);
+                                    // this means it will end because it gets the follow for that one
+                                    if (this.noTerminals.includes(symbol2) && !something.includes('')){
+                                        rule3.push([analyzedNon, symbol2]);
+                                        break;
+                                    }
+                                    // if it is follow because it is epsilon it will actually count to follow
+                                    else if (this.noTerminals.includes(symbol2)){
+                                        rule3.push([analyzedNon, symbol2]);
+                                    }
+                                    // if it is a nonterminal it stops
+                                    else if (this.tokens.includes(symbol2)){
+                                        break;
+                                    };
+                                    m--;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // rule 3: update if they have the same
+        for (let j = 0; j < rule3.length; j++){
+            let pairs = rule3[j];
+            this.followSet.get(pairs[0]).map((symbol)=>{
+                if (!this.followSet.get(pairs[1]).includes(symbol)){
+                    this.followSet.get(pairs[1]).push(symbol);
+                }
+            })
+        }
+    }
+    constructParsingTableLL(){
+        let parsingTable = Array.from({ length: this.noTerminals.length }, () => Array.from({ length: this.tokens.length+1 }, () => null));
+        for (let k = 0; k < this.noTerminals.length; k++){
+            let analyzedNon = this.noTerminals[k];
+            for (let j = 0; j < this.productions.get(analyzedNon).length; j++){
+                let production = this.productions.get(analyzedNon)[j];
+                let terminals = this.firstString(production);
+                for (let l = 0; l < terminals.length; l++){
+                    let terminal = terminals[l];
+                    // If it is a terminal or is epsilon
+                    // Rule 1: for each terminal a in first(alpha), add A->alpha to M[A,a]
+                    if (this.tokens.includes(terminal)){
+                        parsingTable[k][this.tokens.indexOf(terminal)] = production;
+                    }
+                }
+                // Rule 2: if ε is in first(alpha, then for each terminal b) 
+                if (terminals.includes('')){
+                    this.followSet.get(analyzedNon).map((terminal)=>{
+                        if (this.tokens.includes(terminal)){
+                            parsingTable[k][this.tokens.indexOf(terminal)] = production;
+                        } 
+                        // Will be the last 
+                        else if (terminal==='$'){
+                            parsingTable[k][this.tokens.length] = production;
+                        };
+                    });
+                };   
+            }
+        }
+        return parsingTable;
+    }
+    constructParsingTableSLR(){
+        // Already created the C collection of items
+        let actionTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.tokens.length+1 }, () => null));
+        let goToTable = Array.from({ length: this.items.length }, () => Array.from({ length: this.noTerminals.length }, () => null));
+        let errors = ``;
+        // state i constructed from Ii 
+        for (let i = 0; i < this.items.length; i++){
+            let Ii = this.items[i];
+            // CONSTRUCT ACTION TABLE
+            // b
+            let something = Ii.filter((item=>item.pos===item.production.length && item.name !== "E\'"));
+            if (something.length>0){
+                for (let k = 0; k < something.length; k++){
+                    this.followSet.get(something[k].name).map(
+                        (terminal)=>{
+                            if(terminal!=="$"){
+                                actionTable[i][this.tokens.indexOf(terminal)]= something[k];
+                            }
+                            else{
+                                actionTable[i][this.tokens.length]= something[k];
+                            }
+                        }
+                    );
+                }
+            }
+            // c    
+            if (Ii.filter((item=>item.pos===item.production.length && item.name === "E\'")).length>0){
+                actionTable[i][this.tokens.length] = 'accept';
+            }
+            for (let k = 0; k < this.tokens.length; k++){
+                let terminal = this.tokens[k];
+                // a
+                let j = this.findIndexInArrayOfArrayOfItems(this.items,this.goTo(Ii, terminal));
+                let values = Ii.filter(((item)=>item.pos<=item.production.length-1 && item.production[item.pos]===terminal));
+                if (values.length>0 && j!==-1 && actionTable[i][k]===null){
+                    actionTable[i][k] = `s${j}`;
+                }
+                // Conflict shift-reduction
+                else if (values.length>0 && j!==-1 && actionTable[i][k]!==null){
+                    errors+=`Error: Shift-Reduction conflict in Action Table [I${i}][${terminal}] = shift ${j} or  reduce ${actionTable[i][k].name} -> ${actionTable[i][k].production.join(" ")} \n`;
+                }
+            }
+            // CONSTRUCT GO TO TABLE
+            for (let k = 0; k < this.noTerminals.length; k++){
+                let j = this.findIndexInArrayOfArrayOfItems(this.items,this.goTo(Ii, this.noTerminals[k]));
+                if (j !== -1){
+                    goToTable[i][k] = j;
+                }
+            }
+        }
+        this.actionTable = actionTable;
+        this.goToTable = goToTable;
+        if (errors!==``){
+            throw new Error(errors);
+        }
+    }
+    parsingAlgorithm(w){
+        let response = `STACK               SYMBOLS             INPUT               ACTION\n`;
+        w.push("$");
+        let a = w[0];
+        let stack = [0];
+        let symbols = [];
+        let pos = 0;
+        let hasErrors = false;
+        while (true){
+            let s = stack[stack.length-1];
+            let value = null;
+            if (w[pos]!=="$"){
+                value = this.actionTable[s][this.tokens.indexOf(w[pos])];
+            }
+            else{
+                value = this.actionTable[s][this.tokens.length];
+            }            
+            // It is shift
+            if (typeof(value)==="string" && value!=="accept"){
+                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               ${value}\n`;
+                console.log(this.actionTable[s][this.tokens.indexOf(w[pos])])
+                stack.push(parseInt(this.actionTable[s][this.tokens.indexOf(w[pos])].slice(1)));
+                symbols.push(value);
+                pos++;
+            }
+            // It is an item, is reduce
+            else if (value!==null&& value!=="accept" && value!==undefined){
+                value.production.map(()=>{
+                    stack.pop();
+                });
+                stack.push(this.goToTable[stack[stack.length-1]][this.noTerminals.indexOf(value.name)]);
+                console.log(`${value.name}->${value.production.join(" ")}`);
+                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               ${value.name}->${value.production.join(" ")}\n`
+                // pos++;
+            }
+            // Acceptance
+            else if (value==="accept"){
+                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               accept\n`
+                break;
+            }
+            // Recovery
+            else{
+                response += `Error with token ${w[pos]}, unexpected token in position ${pos.toString()}\n`;
+                hasErrors = true;
+                if (w.length === pos){
+                    break;
+                }
+                // continue parsing
+                pos++;
+            }
+        }
+        console.log(response);
+        if (hasErrors){
+            return {response:response, accept: false};
+        }
+        return {response:response, accept: true};        
+    }
 }
 module.exports = YaPar;

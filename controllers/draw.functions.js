@@ -310,12 +310,17 @@ const drawGraphTokens = (nfa) => {
     return [string_graph, counter];
   };
   
-  function drawGraphItems(items, transitions){
+  function drawGraphItems(items, transitions, finalState){
     let string_graph = `digraph items{rankdir=LR;\nsize="20,20;\n"`;
     let transitionText = ""
     for (let k = 0; k < items.length; k++){
       // Creating the nodes
-      string_graph+=`node[shape = box, label=\"I${k}\n`;
+      if (k === finalState){
+        string_graph+=`node[shape = box, peripheries=2, label=\"I${k}\n`;
+      }
+      else{
+        string_graph+=`node[shape = box,peripheries=1, label=\"I${k}\n`;
+      }
       for (let j = 0; j < items[k].length; j++){
         let item = items[k][j];
         let stringProduction = item.production.join(" ").split(" ");
@@ -364,6 +369,69 @@ const drawTreeTokensAscii = (tree) =>{
     };
     return [string_graph, counter];
   };
+  function createParsingTableLL(terminals, noTerminals, parsingTable){
+    let dotStr = `digraph G {graph [rankdir=LR];table [shape=plaintext, label=<<table border="1" cellborder="1" cellspacing="0"><tr><td>terminals/NonTerminals</td>`;
+    terminals.map((terminal)=>{
+      dotStr+=`<td>${terminal}</td>`
+    });
+    dotStr+=`<td>$</td></tr>`
+    for (let i = 0; i < parsingTable.length; i++){
+      let nonTerminal = noTerminals[i];
+      dotStr+=`<tr><td>${nonTerminal}</td>`
+      for (let j = 0; j < parsingTable[i].length; j++){
+        if (parsingTable[i][j]===null||parsingTable[i][j]===undefined){
+          dotStr+=`<td>NULL</td>`;
+        }
+        else{
+          dotStr+=`<td>${nonTerminal}=`
+          for (let k = 0; k < parsingTable[i][j].length; k++){
+            dotStr+=`${parsingTable[i][j][k]} `;
+            if (parsingTable[i][j][k] === ''){
+              dotStr+='ε';
+            }
+          }
+          dotStr+=`</td>`;
+        }
+      }
+      dotStr+=`</tr>`
+    }
+    dotStr+='</table>>];}';
+    // console.log(dotStr);
+    return dotStr;
+  }
+  function createParsingTableSLR(terminals, noTerminals, actionTable, goToTable){
+    let dotStr = `digraph G {graph [rankdir=LR];table [shape=plaintext, label=<<table border="1" cellborder="1" cellspacing="0"><tr><td>Terminals/States</td>`;
+    terminals.map((terminal)=>{
+      dotStr+=`<td>${terminal}</td>`;
+    });
+    dotStr+=`<td>$</td>`;
+    noTerminals.map((nonTerminal)=>{
+      dotStr+=`<td>${nonTerminal}</td>`;
+    });
+    dotStr+=`</tr>`;
+    for (let i = 0; i < actionTable.length; i++){
+      dotStr+=`<tr><td>I${i}</td>`
+      let values = actionTable[i];
+      values.map((pos)=>{
+        if (typeof(pos)==="string"){
+          dotStr+=`<td>${pos}</td>`;
+        }
+        else if (pos === null){
+          dotStr+=`<td>NULL</td>`;
+        }
+        else{
+          dotStr+=`<td>${pos.name}: ${pos.production.join(" ")}</td>`;
+        }
+      })
+      goToTable[i].map((value)=>{
+        dotStr+=`<td>${value}</td>`
+      });      
+      dotStr+=`</tr>`
+    }
+    dotStr+='</table>>];}';
+    // console.log(dotStr);
+    return dotStr;
+  }
   module.exports = {
     drawGraph,
     drawGraphDFA,
@@ -372,4 +440,6 @@ const drawTreeTokensAscii = (tree) =>{
     drawTreeNodeTokensAscii,
     drawTreeTokens,
     drawGraphItems,
+    createParsingTableLL,
+    createParsingTableSLR
   }

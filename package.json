@@ -20,7 +20,7 @@
   },
   "scripts": {
     "client": "nodemon index.js",
-    "server": "nodemon index",
+    "server": "nodemon index.js",
     "start": "concurrently \"yarn run server\" \"yarn run client\""
   }
 }
