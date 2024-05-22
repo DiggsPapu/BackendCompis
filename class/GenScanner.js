@@ -41,6 +41,7 @@ class GenScanner {
             let data = `
 const fs = require('fs');
 let newToken = null;
+let tokens = [];
 async function tokenize(filepath){
     // Deserialize the yalex Automathon
     let yalexNFA = ${yalexNFA.serialized};
@@ -74,6 +75,7 @@ async function tokenize(filepath){
           if (accepted && finalStatesKeys.filter(element => S.map(state=>state.label).includes(element)).length>0){
             let fState = finalStatesKeys.filter(element => S.map(state=>state.label).includes(element))[0];
             newToken = data.slice(k, indexTemp+1);
+            tokens.push(newToken);
             console.log("Token accepted in rule->"+finalStatesMap.get(fState)+": '"+data.slice(k, indexTemp+1)+"'");
             let rule = regD[finalStatesMap.get(fState)]["rule"];
             console.log("Evaluating rule:"+rule)
@@ -83,6 +85,7 @@ async function tokenize(filepath){
           }
           // else show a lexical error
           else{
+            tokens.push(undefined);
             throw new Error("Lexical error, unexpected token: \'"+data[k]+"\' regex");
           }
         }
@@ -138,14 +141,19 @@ function readText(filepath) {
     });
   };
   // Change the path to get the text
-tokenize("./texts/texto.txt");
+  async function tokenizeFile(filepath){
+    await tokenize(filepath);
+    return tokens;
+    }
+    module.exports = {tokenizeFile};
+// tokenize("./texts/texto.txt");
 `;
             this.scanner += data;
             for (let j = 0; j < tokensSet.get("TRAILER").length; j++){
               this.scanner += tokensSet.get("TRAILER")[j];
             }
             // Generate the scanner
-            fs.writeFile("Scanner.js", this.scanner, (err) => {
+            fs.writeFile("/root/BackendCompis/utils/Scanner.js", this.scanner, (err) => {
                 if (err) {
                   console.error('Error writing file:', err);
                 } else {

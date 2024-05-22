@@ -384,16 +384,33 @@ class YaPar{
             throw new Error(errors);
         }
     }
-    // parsingAlgorithm(w){
-    //     w+="$";
-    //     let a = w[0];
-    //     let stack = [];
-    //     let symbols = [];
-    //     while (true){
-    //         if (this.action[stack[stack.length-1]][this.]){
+    parsingAlgorithm(w){
+        w+="$";
+        let a = w[0];
+        let stack = [0];
+        let symbols = [];
+        let pos = 0;
+        while (true){
+            let s = stack[stack.length-1];
+            // It is shift
+            if (typeof(this.actionTable[s][this.tokens.indexOf(w[pos])])==="string" && this.actionTable[s][this.tokens.indexOf(w[pos])]!=="accept"){
+                stack.push(this.actionTable[s][w[pos]].slice(1));
+            }
+            // It is an item, is reduce
+            else if (this.actionTable[s][this.tokens.indexOf(w[pos])]!==null){
+                this.actionTable[s][this.tokens.indexOf(w[pos])].productions.map(()=>{
+                    stack = stack.pop();
+                });
+            }
+            // Acceptance
+            else if (this.actionTable[s][this.tokens.indexOf(w[pos])]==="accept"){
+                break;
+            }
+            // Recovery
+            else{
 
-    //         }
-    //     }
-    // }
+            }
+        }
+    }
 }
 module.exports = YaPar;

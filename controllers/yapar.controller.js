@@ -1,22 +1,21 @@
 const fs = require('fs');
 const YalexAnalyzer = require("../class/YalexAnalyzer");
 const YaparTokenizer = require("../utils/YaparScanner");
+var GenScanner = require('../class/GenScanner.js');
 const YaPar = require('../class/YaPar');
 const { drawGraphItems, createParsingTableLL, createParsingTableSLR } = require('./draw.functions');
 const { graphviz } = require('node-graphviz');
+const NFA = require('../class/NFA.js');
 let yapar = null;
+let yalexAnalyzer = null;
+let scanner = null; 
 async function postFiles(data, res){
   try {
     // Analyze a yalex
-    let yalexAnalyzer = new YalexAnalyzer(data["body"]["yalex"]);
+    yalexAnalyzer = new YalexAnalyzer(data["body"]["yalex"]);
+    // scanner = new GenScanner(yalexAnalyzer.nfa, yalexAnalyzer.rulesVal, yalexAnalyzer.tokensSet);
     // Make a yapar file to tokenize it then
-    fs.writeFile("yaparFile.yalp", data["body"]["yapar"], (err) => {
-      if (err) {
-        console.error('Error writing file:', err);
-      } else {
-        console.log('File created successfully.');
-      }
-    });
+    fs.writeFile("yaparFile.yalp", data["body"]["yapar"], (err) => {});
     // Tokenize the yapar
     let [tokens, ignoreTokens, productions] = await YaparTokenizer.tokenizeYapar("./yaparFile.yalp");
     let keys = Array.from(yalexAnalyzer.rulesSet.keys());
@@ -117,9 +116,47 @@ async function getParsingTableLL(data, res){
   }
 };
 async function evaluateChain(data, res){
-
-  console.log(data["body"]);
-
+  let input = data["body"]["input"];
+  let tokens = [];
+  let tokensTok = [];
+  let accepted = null;
+  let S = null;
+  let indexTemp = 0;
+  // yapar.
+  yalexAnalyzer.nfa.serializeAutomathon();
+  // To avoid strings
+  let nfa = yalexAnalyzer.nfa.deSerializeAutomathon(yalexAnalyzer.nfa.serialized);
+  let keys = Array.from(yalexAnalyzer.rulesVal.keys());
+  for (let k = 0; k < input.length; k++){
+    accepted = false;
+    S = null;
+    [accepted, indexTemp, S] = nfa.yalexSimulate(input, k);
+    // If it is accepted eval it
+    try{
+      let values = [];
+      let possibleTok = null;
+      keys.map((key)=>{
+        let longitude = values.length;
+        values.push(...yalexAnalyzer.rulesVal.get(key)[9].filter(element => S.map(state=>state.label).includes(element)));
+        if (longitude!==values.length && possibleTok===null){possibleTok=key;tokensTok.push(key)};
+      });
+      if (accepted && values.length>0){
+        let newToken = input.slice(k, indexTemp+1);
+        tokens.push(newToken);
+        k = indexTemp;
+      }
+      // else show a lexical error
+      else{
+        tokens.push(undefined);
+        console.log("Lexical error, unexpected token: \'"+input.slice(k, k+10)+"\' regex");
+      }
+    }
+    catch(e){
+      console.error(e);
+    };
+  };
+  
+  res.status(200).send({message:"hola"});
 }
 module.exports = {
     postFiles,

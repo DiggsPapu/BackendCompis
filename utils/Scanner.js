@@ -1,5 +1,28 @@
+let ID = "Identificador";
+let PLUS = "Suma";
+let TIMES = "Multiplicacion";
+let LPAREN = "Parentesis izquierdo";
+let RPAREN = "Parentesis derecho";
+/**
+ * Clase para modelar estados del AFN/AFD
+ *
+ * tiene:
+ *
+ * - label
+ * - un mapa (diccionario) con transiciones
+ *
+ */
 
-var State = require("./State");
+class State {
+  constructor(label, transitions) {
+    this.label = label;
+    this.transitions = transitions;
+  }
+}
+
+
+
+;
 
 /**
  * Clase con el NFA a construir, incluye:
@@ -134,7 +157,6 @@ class NFA {
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
     let c = input.charCodeAt(indexInput).toString();
-    // console.log(c)
     while (indexInput<input.length) {
       S = this.eClosureT(this.move(S, c, this),this);
       // console.log(input[indexInput])
@@ -280,4 +302,113 @@ class NFA {
   }
 };
 
-module.exports = NFA
+
+const fs = require('fs');
+let newToken = null;
+let tokens = [];
+async function tokenize(filepath){
+    // Deserialize the yalex Automathon
+    let yalexNFA = {"alphabet":[32,9,10,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,48,49,50,51,52,53,54,55,56,57,43,42,40,41],"initialState":{"name":"init","transitions":{"ε":["q0","q2","q5","q7","q9","q11"]}},"states":{"q0":{"9":"q1","10":"q1","32":"q1"},"q1":{"9":"q1","10":"q1","32":"q1"},"init":{"ε":["q0","q2","q5","q7","q9","q11"]},"q2":{"65":"q3","66":"q3","67":"q3","68":"q3","69":"q3","70":"q3","71":"q3","72":"q3","73":"q3","74":"q3","75":"q3","76":"q3","77":"q3","78":"q3","79":"q3","80":"q3","81":"q3","82":"q3","83":"q3","84":"q3","85":"q3","86":"q3","87":"q3","88":"q3","89":"q3","90":"q3","97":"q3","98":"q3","99":"q3","100":"q3","101":"q3","102":"q3","103":"q3","104":"q3","105":"q3","106":"q3","107":"q3","108":"q3","109":"q3","110":"q3","111":"q3","112":"q3","113":"q3","114":"q3","115":"q3","116":"q3","117":"q3","118":"q3","119":"q3","120":"q3","121":"q3","122":"q3"},"q3":{"48":"q3","49":"q3","50":"q3","51":"q3","52":"q3","53":"q3","54":"q3","55":"q3","56":"q3","57":"q3","65":"q3","66":"q3","67":"q3","68":"q3","69":"q3","70":"q3","71":"q3","72":"q3","73":"q3","74":"q3","75":"q3","76":"q3","77":"q3","78":"q3","79":"q3","80":"q3","81":"q3","82":"q3","83":"q3","84":"q3","85":"q3","86":"q3","87":"q3","88":"q3","89":"q3","90":"q3","97":"q3","98":"q3","99":"q3","100":"q3","101":"q3","102":"q3","103":"q3","104":"q3","105":"q3","106":"q3","107":"q3","108":"q3","109":"q3","110":"q3","111":"q3","112":"q3","113":"q3","114":"q3","115":"q3","116":"q3","117":"q3","118":"q3","119":"q3","120":"q3","121":"q3","122":"q3"},"q5":{"43":"q6"},"q6":{},"q7":{"42":"q8"},"q8":{},"q9":{"40":"q10"},"q10":{},"q11":{"41":"q12"},"q12":{}},"finalStates":{"q1":{"9":"q1","10":"q1","32":"q1"},"q3":{"48":"q3","49":"q3","50":"q3","51":"q3","52":"q3","53":"q3","54":"q3","55":"q3","56":"q3","57":"q3","65":"q3","66":"q3","67":"q3","68":"q3","69":"q3","70":"q3","71":"q3","72":"q3","73":"q3","74":"q3","75":"q3","76":"q3","77":"q3","78":"q3","79":"q3","80":"q3","81":"q3","82":"q3","83":"q3","84":"q3","85":"q3","86":"q3","87":"q3","88":"q3","89":"q3","90":"q3","97":"q3","98":"q3","99":"q3","100":"q3","101":"q3","102":"q3","103":"q3","104":"q3","105":"q3","106":"q3","107":"q3","108":"q3","109":"q3","110":"q3","111":"q3","112":"q3","113":"q3","114":"q3","115":"q3","116":"q3","117":"q3","118":"q3","119":"q3","120":"q3","121":"q3","122":"q3"},"q6":{},"q8":{},"q10":{},"q12":{}}};
+    // Read the data
+    await readText(filepath)
+    .then(data => {
+      // The regex Data
+      let regD = {"ws":{"rule":"","finalStates":["q1"]},"id":{"rule":"console.log(ID+ID);","finalStates":["q3"]},"plus":{"rule":"console.log(PLUS+PLUS);","finalStates":["q6"]},"times":{"rule":"console.log(TIMES+TIMES);","finalStates":["q8"]},"lparen":{"rule":"console.log(LPAREN+LPAREN);","finalStates":["q10"]},"rparen":{"rule":"console.log(RPAREN+RPAREN);","finalStates":["q12"]}};
+      let finalStatesMap = new Map();
+      let keys = Object.keys(regD);
+      for (let k = 0; k < keys.length; k++){
+        let key = keys[k];
+        for (let j = 0; j < regD[key]["finalStates"].length; j++){
+          finalStatesMap.set(regD[key]["finalStates"][j], key);
+        }
+      }
+      let finalStatesKeys = Array.from( finalStatesMap.keys() );
+      // Tokenizer with yalex automathon
+      let S = null;
+      let accepted = false;
+      let indexTemp = 0;
+      let token = null;
+      yalexNFA = deSerializeAutomathon(yalexNFA);
+      for (let k = 0; k < data.length; k++){
+        token = null;
+        accepted = false;
+        S = null;
+        [accepted, indexTemp, S] = yalexNFA.yalexSimulate(data, k);
+        console.log(yalexNFA.yalexSimulate(data, k));
+        // If it is accepted eval it
+        try{
+          if (accepted && finalStatesKeys.filter(element => S.map(state=>state.label).includes(element)).length>0){
+            let fState = finalStatesKeys.filter(element => S.map(state=>state.label).includes(element))[0];
+            newToken = data.slice(k, indexTemp+1);
+            tokens.push(newToken);
+            console.log("Token accepted in rule->"+finalStatesMap.get(fState)+": '"+data.slice(k, indexTemp+1)+"'");
+            let rule = regD[finalStatesMap.get(fState)]["rule"];
+            console.log("Evaluating rule:"+rule)
+            k = indexTemp;
+            // Get which final State is obtained, we assume the first state in the final states obtained
+            evalRule(rule);
+          }
+          // else show a lexical error
+          else{
+            tokens.push(undefined);
+            throw new Error("Lexical error, unexpected token: '"+data[k]+"' regex");
+          }
+        }
+        catch(e){
+          console.error(e);
+        };
+      }
+    })
+    .catch(err => {
+        console.error('Error reading file:', err); // Handle errors
+    });        
+}
+function evalRule(rule){
+  console.log(eval(rule));
+}
+function deSerializeAutomathon(parsedSerializeAutomathon){
+  let alphabet = parsedSerializeAutomathon["alphabet"];
+  let states = [];
+  let finalStates = [];
+  let initialState = null;
+  let keysFinalStates = Object.keys(parsedSerializeAutomathon["finalStates"]);
+  let newTransitions = new Map();
+  for (let stateName in parsedSerializeAutomathon.states){
+    let transitions = new Map();
+    // Get the transitions
+    for (let key in parsedSerializeAutomathon["states"][stateName]){
+      transitions.set(key, parsedSerializeAutomathon["states"][stateName][key]);
+    }
+    let newState = new State(stateName, transitions);
+    states.push(newState);
+    // Get initial state
+    if (stateName === parsedSerializeAutomathon["initialState"]["name"]){
+      initialState = newState;
+    }
+    // Check if is final state
+    if (keysFinalStates.includes(stateName)){
+      finalStates.push(newState);
+    }
+    newTransitions.set(stateName, transitions);
+  }
+  return new NFA(initialState, finalStates, states, alphabet, newTransitions);
+};
+function readText(filepath) {
+    return new Promise((resolve, reject) => {
+      // Read the data
+      fs.readFile(filepath, 'utf8', (err, data) => {
+        if (err) {
+          reject(err); // Pass error to reject handler
+          return;
+        }
+        resolve(data); // Pass data to resolve handler
+      });
+    });
+  };
+  // Change the path to get the text
+  async function tokenizeFile(filepath){
+    await tokenize(filepath);
+    return tokens;
+    }
+    module.exports = {tokenizeFile};
+tokenize("/root/BackendCompis/texts/texto.txt");
