@@ -71,7 +71,7 @@ function getScanner(req, res){
     try {
         if (yalex !== null){
             scanner = new GenScanner(yalex.nfa, yalex.rulesVal, yalex.tokensSet);
-            res.download("/root/BackendCompis/Scanner.js", (err) => {
+            res.download("/root/BackendCompis/utils/Scanner.js", (err) => {
               if (err) {
                 console.error('Error downloading file:', err);
                 res.status(500).send('Error downloading file.');

@@ -157,6 +157,7 @@ class NFA {
     // Inicializar el estado 0
     let S = this.eClosureT([this.initialState], this);
     let c = input.charCodeAt(indexInput).toString();
+    // console.log(c)
     while (indexInput<input.length) {
       S = this.eClosureT(this.move(S, c, this),this);
       // console.log(input[indexInput])
@@ -334,7 +335,6 @@ async function tokenize(filepath){
         accepted = false;
         S = null;
         [accepted, indexTemp, S] = yalexNFA.yalexSimulate(data, k);
-        console.log(yalexNFA.yalexSimulate(data, k));
         // If it is accepted eval it
         try{
           if (accepted && finalStatesKeys.filter(element => S.map(state=>state.label).includes(element)).length>0){
@@ -411,4 +411,4 @@ function readText(filepath) {
     return tokens;
     }
     module.exports = {tokenizeFile};
-tokenize("/root/BackendCompis/texts/texto.txt");
+// tokenize("./texts/texto.txt");

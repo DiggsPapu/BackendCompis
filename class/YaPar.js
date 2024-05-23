@@ -385,7 +385,7 @@ class YaPar{
         }
     }
     parsingAlgorithm(w){
-        let response = `STACK               SYMBOLS             INPUT               ACTION\n`;
+        let response = `<table><tr><th>STACK<th/><th>SYMBOLS<th/><th>INPUT<th/><th>ACTION<th/><tr/>`;
         w.push("$");
         let a = w[0];
         let stack = [0];
@@ -403,8 +403,8 @@ class YaPar{
             }            
             // It is shift
             if (typeof(value)==="string" && value!=="accept"){
-                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               ${value}\n`;
-                console.log(this.actionTable[s][this.tokens.indexOf(w[pos])])
+                response+=`<tr><td>${stack.join(",")}]<td/><td>[${symbols.join(",")}]<td/><td>[${w.slice(pos, w.length-1)}]<td/><td>${value}<td/><tr/>`;
+                // console.log(this.actionTable[s][this.tokens.indexOf(w[pos])])
                 stack.push(parseInt(this.actionTable[s][this.tokens.indexOf(w[pos])].slice(1)));
                 symbols.push(value);
                 pos++;
@@ -416,17 +416,17 @@ class YaPar{
                 });
                 stack.push(this.goToTable[stack[stack.length-1]][this.noTerminals.indexOf(value.name)]);
                 console.log(`${value.name}->${value.production.join(" ")}`);
-                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               ${value.name}->${value.production.join(" ")}\n`
+                response+=`<tr><td>[${stack.join(",")}]<td/><td>[${symbols.join(",")}]<td/><td>[${w.slice(pos, w.length-1)}]<td/><td>${value.name}->${value.production.join(" ")}<td/><tr/>`
                 // pos++;
             }
             // Acceptance
             else if (value==="accept"){
-                response+=`[${stack.join(",")}]             [${symbols.join(",")}]              [${w.slice(pos, w.length-1)}]               accept\n`
+                response+=`<tr><td>[${stack.join(",")}]<td/><td>[${symbols.join(",")}]<td/><td>[${w.slice(pos, w.length-1)}]<td/><td>accept<td/><tr/>`
                 break;
             }
             // Recovery
             else{
-                response += `Error with token ${w[pos]}, unexpected token in position ${pos.toString()}\n`;
+                response += `<tr><td>Error with token ${w[pos]}, unexpected token in position ${pos.toString()}<td/><tr/>`;
                 hasErrors = true;
                 if (w.length === pos){
                     break;
