@@ -153,7 +153,7 @@ function readText(filepath) {
               this.scanner += tokensSet.get("TRAILER")[j];
             }
             // Generate the scanner
-            fs.writeFile("/root/BackendCompis/utils/Scanner.js", this.scanner, (err) => {
+            fs.writeFile("./utils/Scanner.js", this.scanner, (err) => {
                 if (err) {
                   console.error('Error writing file:', err);
                 } else {
