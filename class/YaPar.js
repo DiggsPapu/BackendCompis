@@ -15,6 +15,7 @@ class YaPar{
         this.addInitialState();
         this.constructCanonical();
         this.follow(this.noTerminals[0]);
+        console.log(this.followSet);
         this.constructParsingTableSLR();
     }
     addInitialState(){
@@ -31,19 +32,26 @@ class YaPar{
             });
         });
     }
-    findIndexInArrayOfArrayOfItems(C, setItems) {
-        for (let i = 0; i < C.length; i++) {
-            if (C[i].every(item => {
-                return setItems.some(item1 => {
-                    return JSON.stringify(item1) === JSON.stringify(item);
-                });
-            })) {
-                return i; // Return the index if setItems are found
+    findIndexInArrayOfArrayOfItems(C, setItems){
+        for (let i = 0; i < C.length; i++){
+            let possibleSet = C[i];
+            if (possibleSet.length === setItems.length){
+                let equal = 1;
+                possibleSet.map((item)=>{
+                    if (setItems.filter((item2)=>item2.name===item.name && item2.pos === item.pos && item2.production.join(" ")===item.production.join(" ")).length===1){
+                        equal*=1;
+                    }
+                    else{
+                        equal*=0;
+                    }
+                })
+                if (equal){
+                    return i;
+                }
             }
         }
-        return -1; // Return -1 if setItems are not found in any array
+        return -1;
     }
-    
     constructCanonical(){
         let C = [this.closure(this.items[0])];
         let grammarSymbols = ["E\'", ...Array.from(this.productions.keys()), ...this.tokens.filter((token)=>!this.ignoreTokens.includes(token))];
@@ -62,18 +70,16 @@ class YaPar{
                     let newSetItems = this.goTo(setItem, symbol);
                     // console.log(newSetItems)
                     // console.log("Found: "+this.setItemsInArray(C, newSetItems)+"    index:"+this.findIndexInArrayOfArrayOfItems(C, newSetItems));
-                    if (newSetItems.length >0 && !this.setItemsInArray(C, newSetItems)){
+                    // Get the index of the setItem
+                    let index = this.findIndexInArrayOfArrayOfItems(C, newSetItems);
+                    if (newSetItems.length >0 && index===-1){
                         C.push(newSetItems);
                         // Add transition to the index
                         this.transitions.get(k).set(symbol, C.length-1);
                     }
                     // The setItem exist so must add a transition to it
-                    else{
-                        // Get the index of the setItem
-                        let index = this.findIndexInArrayOfArrayOfItems(C, newSetItems);
-                        if (index!==-1){
-                            this.transitions.get(k).set(symbol, index);
-                        }
+                    else if (index!==-1){
+                        this.transitions.get(k).set(symbol, index);
                     }
                 }
             }
@@ -344,7 +350,13 @@ class YaPar{
                     this.followSet.get(something[k].name).map(
                         (terminal)=>{
                             if(terminal!=="$"){
-                                actionTable[i][this.tokens.indexOf(terminal)]= something[k];
+                                // Possible RR error
+                                if (actionTable[i][this.tokens.indexOf(terminal)]===null){
+                                    actionTable[i][this.tokens.indexOf(terminal)]= something[k];
+                                }
+                                else{
+                                    errors+=`Error: Reduction-Reduction conflict in Action Table [I${i}][${terminal}] = reduce ${actionTable[i][this.tokens.indexOf(terminal)].name} -> ${actionTable[i][this.tokens.indexOf(terminal)].production.join(" ")} or reduce ${something[k].name} -> ${something[k].production.join(" ")} \n`;
+                                }
                             }
                             else{
                                 actionTable[i][this.tokens.length]= something[k];
@@ -381,11 +393,12 @@ class YaPar{
         this.actionTable = actionTable;
         this.goToTable = goToTable;
         if (errors!==``){
+            console.error(errors);
             throw new Error(errors);
         }
     }
     parsingAlgorithm(w){
-        let response = `<table><tr><th>STACK<th/><th>SYMBOLS<th/><th>INPUT<th/><th>ACTION<th/><tr/>`;
+        let response = `<table width:"100%" border="1" cellborder:"0" cellspacing="0"><tr><th>STACK<th/><th>SYMBOLS<th/><th>INPUT<th/><th>ACTION<th/><tr/>`;
         w.push("$");
         let a = w[0];
         let stack = [0];
