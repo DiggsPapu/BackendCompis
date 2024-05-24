@@ -8,8 +8,11 @@ var automatonRoutes = require('./routes/automaton.route');
 var yalexRoutes = require('./routes/yalex.route');
 var yaparRoutes = require('./routes/yapar.route');
 
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 5960;
 var app = express();
+app.get('/', (req, res)=>{
+    res.send('initialPage');
+})
 app.use(cors());
 app.set('views', path.join(__dirname,'views'));
 app.set('view engine','ejs');
