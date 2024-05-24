@@ -1,6 +1,21 @@
-%token A B C
+%token ws
+%token id
+%token plus
+%token lparen rparen
+%token times
+IGNORE ws
 
 %%
 
-s: C a B A | C B B B | B a;
-a: B;
+expression:
+    expression plus term
+  | term
+;
+term:
+    term times factor
+  | factor
+;
+factor:
+    lparen expression rparen
+  | id
+;
